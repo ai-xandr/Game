@@ -6,6 +6,7 @@ build/
 bin/
 .cache/
 *.local
+CMakeSettings.json
 
 ### C ###
 # Prerequisites
