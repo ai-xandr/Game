@@ -1,6 +1,6 @@
 # Игра на C++
 Для сборки проекта необходимы:
-* **Компилятор**: GCC (версия 11+) или Clang.
+* **Компилятор**: GCC или Clang.
 * **Система сборки**: CMake 3.11+.
 ## Сборка и запуск
 ### Клонирование репозитория
@@ -20,5 +20,9 @@ cmake --build build --config Release
 ```
 ### Windows:
 ```shell
-build/bin/Release/Game.exe
+.\build\bin\Release\Game.exe
 ```
+## Разработка
+При создании новых .cpp/.hpp файлов обязательно добавить их в `CMakeLists.txt` в раздел `SOURCE`, а затем пересобрать проект
+`cmake --build build --config Release`, после можно запускать
+(см. раздел запуск)
