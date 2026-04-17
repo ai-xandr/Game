@@ -20,7 +20,7 @@ cmake --build build --config Release
 ```
 ### Windows:
 ```shell
-.\build\bin\Release\Game.exe
+.\build\bin\Game.exe
 ```
 ## Разработка
 При создании новых .cpp/.hpp файлов обязательно добавить их в `CMakeLists.txt` в раздел `SOURCE`, а затем пересобрать проект
