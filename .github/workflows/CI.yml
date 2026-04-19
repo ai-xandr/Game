@@ -46,7 +46,7 @@ jobs:
             mesa-common-dev \
             libflac-dev \
             libvorbis-dev \
-            libopenal-dev
+            libopenal-dev \
             libfreetype-dev
             
       - name: build via cmake
