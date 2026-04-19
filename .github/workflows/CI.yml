@@ -31,10 +31,23 @@ jobs:
         run: git fetch origin main
 
       - name: install deps
-        run: |
+        run: |+
           sudo apt-get update
-          sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libopengl-dev libflac-dev libvorbis-dev libopenal-dev libgl1-mesa-dev mesa-common-dev libxcursor-dev libxcursor-dev libxinerama-dev libxi-dev
-
+          sudo apt-get install -y -qq \
+            libx11-dev \
+            libxrandr-dev \
+            libxcursor-dev \
+            libxinerama-dev \
+            libxi-dev \
+            libudev-dev \
+            libopengl-dev \
+            libgl1-mesa-dev \
+            libglu1-mesa-dev \
+            mesa-common-dev \
+            libflac-dev \
+            libvorbis-dev \
+            libopenal-dev
+            
       - name: build via cmake
         run: |
           cmake -B build 
