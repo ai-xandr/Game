@@ -16,7 +16,7 @@ jobs:
 
       - name: check git diffs
         run: |
-          git diff --name-only origin/main...HEAD | grep -E "/.clang-format|CMakeLists\.txt|\.git$|\.gitignore|README\.md|scripts" && exit 1 || exit 0
+          git diff --name-only origin/main...HEAD | grep -E "\.clang-format|CMakeLists\.txt|\.git$|\.github|\.gitignore|README\.md|scripts" && exit 1 || exit 0
 
   build:
     needs: diffs-validation
