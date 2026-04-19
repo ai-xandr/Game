@@ -33,7 +33,7 @@ jobs:
       - name: install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libopengl-dev libflac-dev libvorbis-dev libopenal-dev libgl1-mesa-dev mesa-common-dev
+          sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libopengl-dev libflac-dev libvorbis-dev libopenal-dev libgl1-mesa-dev mesa-common-dev libxcursor-dev libxcursor-dev libxinerama-dev libxi-dev
 
       - name: build via cmake
         run: |
