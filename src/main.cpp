@@ -7,5 +7,5 @@ int main() {
     shape.setFillColor(sf::Color::Green);
 
     std::cout << "SFML Window created successfully!" << std::endl;
-    return 0; 
+    return 0;
 }
