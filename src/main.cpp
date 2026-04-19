@@ -1,11 +1,11 @@
+#include <SFML/Graphics.hpp>
 #include <iostream>
 
-using namespace std;
-
 int main() {
-    cout << "Hello, World!" << endl;
-    cout << "Goodbye, World!" << endl;
-    cout << "test" << endl;
-    cout << "test2" << endl;
-    cout << "test2"  << endl;
+    sf::RenderWindow window(sf::VideoMode(200, 200), "CI Test");
+    sf::CircleShape shape(100.f);
+    shape.setFillColor(sf::Color::Green);
+
+    std::cout << "SFML Window created successfully!" << std::endl;
+    return 0; 
 }
