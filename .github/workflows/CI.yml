@@ -16,7 +16,7 @@ jobs:
 
       - name: check git diffs
         run: |
-          git diff --name-only origin/main...HEAD | grep -vE "^(src/|CMakeLists\.txt$)" || exit 0
+          git diff --name-only origin/main...HEAD | grep -E "/.clang-format|CMakeLists\.txt|\.git|\.github|\.gitignore|README\.md|cripts" && exit 1 || exit 0
 
   build:
     needs: diffs-validation
@@ -33,7 +33,7 @@ jobs:
       - name: install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libopengl-dev libflac-dev libvorbis-dev libopenal-dev
+          sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libopengl-dev libflac-dev libvorbis-dev libopenal-dev libgl1-mesa-dev mesa-common-dev
 
       - name: build via cmake
         run: |
