@@ -16,7 +16,10 @@ jobs:
 
       - name: check git diffs
         run: |
-          git diff --name-only origin/main...HEAD | grep -E "\.clang-format|CMakeLists\.txt|\.git$|\.github|\.gitignore|README\.md|scripts" && exit 1 || exit 0
+          git diff --name-only origin/main...HEAD | grep -E \
+          "\.clang-format|CMakeLists\.txt|\.git$|\.github|\.gitignore|README\.md|scripts" \
+          && exit 1 && echo "Обнаружены изменения в конфигурационных файлах/папках. Верните \
+          их в исходное состояние и попробуйте снова."|| exit 0
 
   build:
     needs: diffs-validation
@@ -31,9 +34,10 @@ jobs:
         run: git fetch origin main
 
       - name: install deps
-        run: |+
+        run: |
           sudo apt-get update
           sudo apt-get install -y -qq \
+            clang-format \
             libx11-dev \
             libxrandr-dev \
             libxcursor-dev \
@@ -48,7 +52,11 @@ jobs:
             libvorbis-dev \
             libopenal-dev \
             libfreetype-dev
-            
+
+      - name: check code style via clang-format
+        run: find src include -name "*.cpp" -o -name "*.hpp" | xargs clang-format
+          --style=file --dry-run --Werror
+
       - name: build via cmake
         run: |
           cmake -B build 
