@@ -6,10 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# --- All files ---
-set(SOURCES 
-    src/main.cpp 
-)
+# --- All src/ files ---
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "include/*.hpp")
 
 # Define output directory for build artifacts
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -32,7 +31,8 @@ set(SFML_INSTALL_PDB OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(SFML)
 
 # --- Target Definition ---
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 # Link against SFML targets provided by FetchContent
 target_link_libraries(${PROJECT_NAME} 
