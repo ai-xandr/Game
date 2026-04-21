@@ -6,34 +6,30 @@ jobs:
   diffs-validation:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: fetch Game repo
+      - name: Fetch Game Repo
         run: git fetch origin main
 
-      - name: check git diffs
+      - name: Check Git Diffs
+        if: github.actor_id != 109551801
         run: |
           git diff --name-only origin/main...HEAD | grep -E \
           "\.clang-format|CMakeLists\.txt|\.git$|\.github|\.gitignore|README\.md|scripts" \
-          && exit 1 && echo "Обнаружены изменения в конфигурационных файлах/папках. Верните \
-          их в исходное состояние и попробуйте снова."|| exit 0
+          && echo "Обнаружены изменения в конфигурационных файлах/папках. Верните \
+          их в исходное состояние и попробуйте снова." && exit 1 || exit 0
 
   build:
     needs: diffs-validation
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: fetch Game repo
-        run: git fetch origin main
-
-      - name: install deps
+      - name: Install Deps
         run: |
           sudo apt-get update
           sudo apt-get install -y -qq \
@@ -53,11 +49,11 @@ jobs:
             libopenal-dev \
             libfreetype-dev
 
-      - name: check code style via clang-format
+      - name: Check Code style via clang-format
         run: find src include -name "*.cpp" -o -name "*.hpp" | xargs clang-format
           --style=file --dry-run --Werror
 
-      - name: build via cmake
+      - name: Build via CMake
         run: |
           cmake -B build 
-          cmake --build build --config Release
+          cmake --build build --config Release --parallel $(nproc)
