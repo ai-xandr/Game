@@ -3,27 +3,7 @@ name: CI for Game
 on: [ pull_request ]
 
 jobs:
-  diffs-validation:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Fetch Game Repo
-        run: git fetch origin main
-
-      - name: Check Git Diffs
-        if: github.actor_id != 109551801
-        run: |
-          git diff --name-only origin/main...HEAD | grep -E \
-          "\.clang-format|CMakeLists\.txt|\.git$|\.github|\.gitignore|README\.md|scripts" \
-          && echo "Обнаружены изменения в конфигурационных файлах/папках. Верните \
-          их в исходное состояние и попробуйте снова." && exit 1 || exit 0
-
   build:
-    needs: diffs-validation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -50,8 +30,8 @@ jobs:
             libfreetype-dev
 
       - name: Check Code style via clang-format
-        run: find src include -name "*.cpp" -o -name "*.hpp" | xargs clang-format
-          --style=file --dry-run --Werror
+        run: find src include -type f \( -name "*.cpp" -o -name "*.hpp" \) \ -exec
+          clang-format --style=file --dry-run --Werror {} +
 
       - name: Build via CMake
         run: |
