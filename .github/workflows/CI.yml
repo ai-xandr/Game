@@ -30,7 +30,7 @@ jobs:
             libfreetype-dev
 
       - name: Check Code style via clang-format
-        run: find src include -type f \( -name "*.cpp" -o -name "*.hpp" \) \ -exec
+        run: find src include -type f \( -name "*.cpp" -o -name "*.hpp" \) -exec
           clang-format --style=file --dry-run --Werror {} +
 
       - name: Build via CMake
