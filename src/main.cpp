@@ -18,6 +18,7 @@ int main() {
 
     sf::Vector2f diverVelocity(0.0f, 0.0f);
     const float waterFading = 0.87f;
+    const float acceleration = 500.0f;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -42,7 +43,19 @@ int main() {
             float length = std::sqrt(movingDirection.x * movingDirection.x +
                                      movingDirection.y * movingDirection.y);
             movingDirection /= length;
-            diverVelocity = movingDirection * Game::PLAYER_SPEED;
+
+            sf::Vector2f targetVelocity = movingDirection * Game::PLAYER_SPEED;
+
+            sf::Vector2f diff = targetVelocity - diverVelocity;
+            float diffLength = std::sqrt(diff.x * diff.x + diff.y * diff.y);
+
+            float maxChange = acceleration * deltaTime;
+
+            if (diffLength <= maxChange) {
+                diverVelocity = targetVelocity;
+            } else {
+                diverVelocity += (diff / diffLength) * maxChange;
+            }
         } else {
             diverVelocity *= waterFading;
             if (std::abs(diverVelocity.x) < 1.0f && std::abs(diverVelocity.y) < 1.0f)
