@@ -14,7 +14,7 @@ jobs:
       - name: Install Deps
         run: |+
           sudo apt-get update
-          sudo apt-get install -y -qq clang-format build-essential
+          sudo apt-get install -y -qq clang-format build-essential ninja-build
                  
       - name: Check Code style via clang-format
         run: |
