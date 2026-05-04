@@ -11,6 +11,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Cache Conan Packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.conan2/p
+          key: ${{ runner.os }}-conan-${{ hashFiles('conanfile.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-conan-
+
       - name: Install Deps
         run: |+
           sudo apt-get update
@@ -31,11 +39,3 @@ jobs:
           conan install . --output-folder=build --build=missing -s build_type=Release -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True
           cmake --preset conan-release
           cmake --build --preset conan-release --parallel
-
-      - name: Cache Conan Packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.conan2/p
-          key: ${{ runner.os }}-conan-${{ hashFiles('conanfile.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-conan-
