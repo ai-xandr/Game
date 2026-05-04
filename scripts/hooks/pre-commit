@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+echo "Running pre-commit linter"
+files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|hpp)$' || true)
+if [ -z "$files" ]; then
+    echo "No C++ files found in staged changes."
+    exit 0
+fi
+for f in $files; do
+    echo -e "Formatting: ${GREEN}$f${NC}"
+    clang-format -i "$f"
+    git add "$f"
+done
+
+echo "Linter finished successfully"
