@@ -9,7 +9,6 @@ if [ -z "$files" ]; then
     exit 0
 fi
 for f in $files; do
-    echo -e "Formatting: ${GREEN}$f${NC}"
     clang-format -i "$f"
     git add "$f"
 done
