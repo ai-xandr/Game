@@ -37,10 +37,9 @@ jobs:
             clang-format --style=file --dry-run --Werror {} +
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
-          cache: "pip"
+          python-version: "3.13"
 
       - name: Install Conan
         run: pip install conan
