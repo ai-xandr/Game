@@ -1,25 +1,72 @@
-# Игра на C++
-Для сборки проекта необходимы:
-* **Компилятор**: GCC или Clang.
+# Game (C++)
+
+Кроссплатформенная игра на базе **SFML 3.0.2**.
+
+## Требования
+
+* **C++ Компилятор**
 * **Система сборки**: CMake 3.11+.
-* **Форматировщик кода**: Clang Format.
-## Сборка и запуск
-### Клонирование репозитория
+* **Пакетный менеджер**: Conan 2.0+.
+* **Интерпретатор**: Python 3.8+ (для скриптов автоматизации).
+* **Форматировщик кода**: Clang-Format.
+
+## Быстрый старт
+
+### 1. Подготовка окружения
+Скрипт автоматически настраивает Git-хуки и проверяет наличие необходимых инструментов.
+
+**Linux / macOS:**
 ```bash
-git clone git@github.com:ai-xandr/Game.git
-cd Game
+python3 scripts/setup.py
 ```
-### Конфигурация и компиляция
+
+**Windows:**
+```powershell
+python scripts/setup.py
+```
+
+### 2. Установка зависимостей
+Использование Conan для загрузки и сборки SFML.
+
+**Универсальная команда:**
 ```bash
-cmake -B build 
-cmake --build build --config Release
+conan install . --output-folder=build --build=missing -s build_type=Release
 ```
-### Запуск
-### Linux:
+
+### 3. Сборка
+
+**Linux / macOS:**
+```bash
+cmake -B build -DCMAKE_TOOLCHAIN_FILE=build/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel $(nproc)
+```
+
+**Windows (PowerShell):**
+```powershell
+cmake -B build -DCMAKE_TOOLCHAIN_FILE=build/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel $env:NUMBER_OF_PROCESSORS
+```
+
+## Запуск
+
+### Linux / macOS
 ```bash
 ./build/bin/Game
 ```
-### Windows:
-```shell
+
+### Windows
+```powershell
 .\build\bin\Game.exe
 ```
+Если выдает ошибку, то попробовать этот вариант:
+
+```powershell
+.\build\bin\Release\Game.exe
+```
+
+---
+
+## Разработка
+
+### Качество кода
+В проекте настроен `pre-commit` хук. Перед каждым коммитом автоматически запускается `clang-format`. Если код не соответствует стилю, он будет отформатирован автоматически перед фиксацией.
