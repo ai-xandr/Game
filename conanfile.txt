@@ -1,0 +1,13 @@
+[requires]
+sfml/3.0.2
+
+[options]
+sfml/*:audio=False
+sfml/*:network=False
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout
