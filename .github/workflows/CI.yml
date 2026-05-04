@@ -26,8 +26,8 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install Conan
-        run: pip install conan
+      - name: Install Conan & Ninja
+        run: pip install conan ninja
 
       - name: Cache Conan Packages
         uses: actions/cache@v4
@@ -42,18 +42,10 @@ jobs:
 
       - name: Conan install
         run: |
-          conan install . --output-folder=build --build=missing \
-            -s build_type=Release \
-            -c tools.system.package_manager:mode=install \
-            -c tools.system.package_manager:sudo=True
-
-      - name: Debug Path (надо найти где файл расположен)
-        run: find build -name "conan_toolchain.cmake"
+          conan profile detect --force
+          conan install . --output-folder=build --build=missing -s build_type=Release -s compiler.cppstd=20
 
       - name: Configure & build
         run: |
-          cmake -B build \
-            -G "Unix Makefiles" \
-            -DCMAKE_TOOLCHAIN_FILE=build/build/Release/generators/conan_toolchain.cmake \
-            -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel $(nproc)
+          cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=build/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel
