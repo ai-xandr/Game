@@ -1,6 +1,8 @@
 name: CI for Game
 
-on: [ pull_request ]
+on:
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
@@ -30,10 +32,37 @@ jobs:
             libfreetype-dev
 
       - name: Check Code style via clang-format
-        run: find src include -type f \( -name "*.cpp" -o -name "*.hpp" \) -exec
-          clang-format --style=file --dry-run --Werror {} +
-
-      - name: Build via CMake
         run: |
-          cmake -B build 
-          cmake --build build --config Release --parallel $(nproc)
+          find src include -type f \( -name "*.cpp" -o -name "*.hpp" \) -exec \
+            clang-format --style=file --dry-run --Werror {} +
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Conan
+        run: pip install conan
+
+      - name: Cache Conan Packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.conan2/p
+          key: ${{ runner.os }}-conan-${{ hashFiles('conanfile.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-conan-
+
+      - name: Conan Profile Detect
+        run: conan profile detect --force
+
+      - name: Conan install
+        run: conan install . --output-folder=build --build=missing -s build_type=Release
+
+      - name: Configure & build
+        run: |
+          cmake -B build \
+            -G "Unix Makefiles" \
+            -DCMAKE_TOOLCHAIN_FILE=build/generators/conan_toolchain.cmake \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc)
