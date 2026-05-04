@@ -21,13 +21,16 @@ jobs:
           find src include -type f \( -name "*.cpp" -o -name "*.hpp" \) -exec \
             clang-format --style=file --dry-run --Werror {} +
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-
-      - name: Install Conan
-        run: pip install conan
+      - name: Use venv and build
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install conan ninja
+          conan profile detect --force
+          conan install . --output-folder=build --build=missing -s build_type=Release -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True
+          cmake --preset conan-release
+          cmake --build --preset conan-release --parallel
 
       - name: Cache Conan Packages
         uses: actions/cache@v4
@@ -36,24 +39,3 @@ jobs:
           key: ${{ runner.os }}-conan-${{ hashFiles('conanfile.txt') }}
           restore-keys: |
             ${{ runner.os }}-conan-
-
-      - name: Conan Profile Detect
-        run: conan profile detect --force
-
-      - name: Conan install
-        run: |
-          conan install . --output-folder=build --build=missing \
-            -s build_type=Release \
-            -c tools.system.package_manager:mode=install \
-            -c tools.system.package_manager:sudo=True
-
-      - name: Debug Path (надо найти где файл расположен)
-        run: find build -name "conan_toolchain.cmake"
-
-      - name: Configure & build
-        run: |
-          cmake -B build \
-            -G "Unix Makefiles" \
-            -DCMAKE_TOOLCHAIN_FILE=build/build/Release/generators/conan_toolchain.cmake \
-            -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel $(nproc)
