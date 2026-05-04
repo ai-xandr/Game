@@ -46,11 +46,15 @@ jobs:
             -s build_type=Release \
             -c tools.system.package_manager:mode=install \
             -c tools.system.package_manager:sudo=True
+            --deployer=direct_deploy
+
+      - name: Debug Path (надо найти где файл расположен)
+        run: find build -name "conan_toolchain.cmake"
 
       - name: Configure & build
         run: |
           cmake -B build \
             -G "Unix Makefiles" \
-            -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/build/generators/conan_toolchain.cmake \
+            -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake \
             -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel $(nproc)
