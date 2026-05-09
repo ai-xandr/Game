@@ -4,11 +4,8 @@
 
 ## Требования
 
-* **C++ Компилятор** (с поддержкой C++20).
-* **CMake** 3.15+.
-* **Conan** 2.0+.
-* **Python** 3.8+.
-* **Ninja** (рекомендуется).
+* **C++ Компилятор** (с поддержкой C++20)
+* **Python** 3.8+
 
 ## Быстрый старт
 
@@ -17,47 +14,17 @@
 git clone git@github.com:ai-xandr/Game.git
 cd Game
 ```
-
-### 1. Подготовка окружения (venv)
-Рекомендуется использовать виртуальное окружение для изоляции инструментов.
+## Настройка
 
 #### Windows
 ```powershell
-python -m venv .venv
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-.\.venv\Scripts\Activate.ps1
-pip install conan ninja
-```
+.\scripts\setup-windows.ps1
+``` 
 
-#### Linux / macOS
+#### Linux
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install conan ninja
-```
-
-### 2. Установка зависимостей и настройка Git
-Использование Conan для генерации пресетов сборки и настройка хуков.
-```bash
-# Настройка Git-хуков (единоразово)
-git config core.hooksPath scripts/hooks
-
-# Установка библиотек и генерация пресетов CMake
-conan profile detect --force
-conan install . --output-folder=build --build=missing -s build_type=Release -s compiler.cppstd=20
-```
-
-### 3. Сборка
-
-#### Конфигурация
-```bash
-cmake --preset conan-default
-```
-
-#### Компиляция
-```bash
-cmake --build --preset conan-release --parallel
-```
+./scripts/setup-linux.sh
+``` 
 
 ## Запуск
 
