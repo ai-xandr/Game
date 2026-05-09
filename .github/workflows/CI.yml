@@ -16,6 +16,7 @@ jobs:
           find src include -type f \( -name "*.cpp" -o -name "*.hpp" \) -exec clang-format --style=file --dry-run --Werror {} +
 
   build:
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -34,7 +35,7 @@ jobs:
           python3 -m venv .venv
           source .venv/bin/activate
           pip install --upgrade pip
-          pip install conan ninja
+          pip install conan ninja cmake
           conan profile detect --force
           conan install . --output-folder=build --build=missing -s build_type=Release -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True
           cmake --preset conan-release
