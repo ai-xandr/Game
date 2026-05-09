@@ -2,10 +2,21 @@ name: CI for Game
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang-format
+        run: sudo apt-get install -y clang-format
+      - name: Check Style
+        run: |
+          find src include -type f \( -name "*.cpp" -o -name "*.hpp" \) -exec clang-format --style=file --dry-run --Werror {} +
+
   build:
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -14,27 +25,17 @@ jobs:
       - name: Cache Conan Packages
         uses: actions/cache@v4
         with:
-          path: ~/.conan2/p
+          path: ~/.conan2
           key: ${{ runner.os }}-conan-${{ hashFiles('conanfile.txt') }}
           restore-keys: |
             ${{ runner.os }}-conan-
-
-      - name: Install Deps
-        run: |+
-          sudo apt-get update
-          sudo apt-get install -y -qq clang-format build-essential
-                 
-      - name: Check Code style via clang-format
-        run: |
-          find src include -type f \( -name "*.cpp" -o -name "*.hpp" \) -exec \
-            clang-format --style=file --dry-run --Werror {} +
 
       - name: Use venv and build
         run: |
           python3 -m venv .venv
           source .venv/bin/activate
           pip install --upgrade pip
-          pip install conan ninja
+          pip install conan ninja cmake
           conan profile detect --force
           conan install . --output-folder=build --build=missing -s build_type=Release -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True
           cmake --preset conan-release
