@@ -34,11 +34,12 @@ jobs:
         with:
           python-version: "3.13"
           cache: "pip" # caching pip dependencies
+          cache-dependency-path: requirements.txt
 
       - name: Install Tools via pip
         run: |
           pip install --upgrade pip
-          pip install conan ninja cmake
+          pip install -r requirements.txt
 
       - name: Build
         run: |
