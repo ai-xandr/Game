@@ -9,7 +9,7 @@
 
 ## Быстрый старт
 
-Клонирование репозитория:
+### Клонирование репозитория:
 ```shell
 git clone git@github.com:ai-xandr/Game.git
 cd Game
@@ -18,6 +18,7 @@ cd Game
 
 #### Windows
 ```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 .\scripts\setup-windows.ps1
 ``` 
 
@@ -26,11 +27,11 @@ cd Game
 ./scripts/setup-linux.sh
 ``` 
 
-## Запуск
+### Запуск
 
 #### Windows
 ```powershell
-.\build\build\Release\Game.exe
+.\build\Release\Game.exe
 ```
 
 #### Linux / macOS
