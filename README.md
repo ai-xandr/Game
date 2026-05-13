@@ -14,7 +14,7 @@
 git clone git@github.com:ai-xandr/Game.git
 cd Game
 ```
-### Настройка
+### Полная Настройка
 
 #### Windows
 ```powershell
@@ -37,4 +37,17 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 #### Linux / macOS
 ```bash
 ./build/build/Release/Game
+```
+
+## Разработка
+
+При добавлении новых, удалении или переименовании .cpp и .hpp файлов необходимо переконфигурировать и пересобрать проект: 
+```
+cmake --preset conan-default
+cmake --build --preset conan-release
+```
+
+Если было измнено только сожержимое .cpp и .hpp файлов, а структура проекта не менялась, то достаточно только перекомпилировать проект:
+```
+cmake --build --preset conan-release
 ```
