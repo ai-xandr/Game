@@ -7,6 +7,11 @@ bin/
 .cache/
 *.local
 
+# Local IDE (optional, per-developer)
+.clangd
+.vscode/settings.json
+.vscode/launch.json
+
 ### C ###
 # Prerequisites
 *.d
@@ -263,9 +268,7 @@ Temporary Items
 
 ### VisualStudioCode ###
 .vscode/*
-!.vscode/settings.json
 !.vscode/tasks.json
-!.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
