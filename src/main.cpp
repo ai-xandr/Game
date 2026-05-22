@@ -1,7 +1,7 @@
 #include "utility.hpp"
 #include <SFML/Graphics.hpp>
-#include <cmath>
 #include <iostream>
+#include <math.h>
 
 int main() {
     std::cout << Game::getInfo() << std::endl;
@@ -18,29 +18,50 @@ int main() {
 
     sf::Clock clock;
 
+    sf::Vector2f diverVelocity(0.0f, 0.0f);
+    const float waterFading = 0.87f;
+    const float acceleration = 500.0f;
+
     while (window.isOpen()) {
         while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>())
                 window.close();
         }
-
         float deltaTime = clock.restart().asSeconds();
-        sf::Vector2f movement(0.0f, 0.0f);
 
+        sf::Vector2f movingDirection(0.0f, 0.0f);
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-            movement.y -= 1.0f;
+            movingDirection.y -= 1.0f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-            movement.y += 1.0f;
+            movingDirection.y += 1.0f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-            movement.x -= 1.0f;
+            movingDirection.x -= 1.0f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-            movement.x += 1.0f;
+            movingDirection.x += 1.0f;
 
-        if (movement.x != 0.0f || movement.y != 0.0f) {
-            float length = std::sqrt(movement.x * movement.x + movement.y * movement.y);
-            movement /= length;
-            player.move(movement * (float)Game::PLAYER_SPEED * deltaTime);
+        if (movingDirection.x != 0.0f || movingDirection.y != 0.0f) {
+            float length = std::sqrt(movingDirection.x * movingDirection.x +
+                                     movingDirection.y * movingDirection.y);
+            movingDirection /= length;
+
+            sf::Vector2f targetVelocity = movingDirection * Game::PLAYER_SPEED;
+
+            sf::Vector2f diff = targetVelocity - diverVelocity;
+            float diffLength = std::sqrt(diff.x * diff.x + diff.y * diff.y);
+
+            float maxChange = acceleration * deltaTime;
+
+            if (diffLength <= maxChange) {
+                diverVelocity = targetVelocity;
+            } else {
+                diverVelocity += (diff / diffLength) * maxChange;
+            }
+        } else {
+            diverVelocity *= waterFading;
+            if (std::abs(diverVelocity.x) < 1.0f && std::abs(diverVelocity.y) < 1.0f)
+                diverVelocity = sf::Vector2f(0.0f, 0.0f);
         }
+        player.move(diverVelocity * deltaTime);
 
         window.clear(sf::Color(30, 30, 30));
         window.draw(player);
