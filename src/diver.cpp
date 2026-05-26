@@ -1,4 +1,5 @@
 #include "diver.hpp"
+#include "common.hpp"
 #include <cmath>
 
 namespace Game {
@@ -57,6 +58,8 @@ void Diver::update(float deltaTime) {
     }
 
     m_position += m_velocity * deltaTime;
+    m_position.x = std::clamp(m_position.x, 0.f, static_cast<float>(Game::WORLD_WIDTH));
+    m_position.y = std::clamp(m_position.y, 0.f, static_cast<float>(Game::WORLD_HEIGHT));
     m_sprite->setPosition(m_position);
 
     if (std::abs(m_velocity.x) > 1.f || std::abs(m_velocity.y) > 1.f) {
