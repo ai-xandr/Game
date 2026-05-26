@@ -14,6 +14,10 @@ class Game {
     void run();
 
   private:
+    void processEvents();
+    void update(float deltaTime);
+    void render();
+
     sf::RenderWindow m_window;
     Camera m_camera;
     Diver m_diver;

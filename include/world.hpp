@@ -1,7 +1,7 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 
-#include "Common.hpp"
+#include "common.hpp"
 #include <vector>
 
 namespace Game {
@@ -17,6 +17,5 @@ class World {
   private:
     std::vector<Fish *> m_fishes;
 };
-
 } // namespace Game
 #endif
