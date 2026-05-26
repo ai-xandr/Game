@@ -13,6 +13,7 @@ class Camera {
 
   private:
     sf::View m_view;
+    sf::FloatRect m_bounds;
 };
 } // namespace Game
 #endif
