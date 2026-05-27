@@ -68,8 +68,8 @@ void Diver::update(float deltaTime) {
     }
 }
 
-void Diver::attack() { 
-    //нож
+void Diver::attack() {
+    //knife attack logic will be implemented here in the future
 }
 
 void Diver::draw(sf::RenderWindow &window) const {
