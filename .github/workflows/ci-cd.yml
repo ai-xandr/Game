@@ -1,4 +1,4 @@
-name: CI for Game
+name: CI/CD for Game
 
 on:
   pull_request:
