@@ -68,7 +68,7 @@ void Diver::update(float deltaTime) {
     }
 }
 
-void Diver::attack() { 
+void Diver::attack() {
     //нож
 }
 
