@@ -25,7 +25,7 @@ class Diver {
     float m_maxSpeed = 200.0f;
     float m_acceleration = 500.0f;
     float m_waterFading = 0.87f;
-    // Графическая часть
+
     sf::Texture m_placeholderTexture;
     std::unique_ptr<sf::Sprite> m_sprite;
 };

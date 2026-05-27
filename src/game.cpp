@@ -37,7 +37,7 @@ void Game::render() {
     m_window.clear(sf::Color(30, 30, 30));
 
     m_window.setView(m_camera.getView());
-    m_world.draw(m_window); // для рыб
+    m_world.draw(m_window); // for fish
     m_diver.draw(m_window);
 
     m_window.display();
