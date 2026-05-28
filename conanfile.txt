@@ -2,7 +2,7 @@
 sfml/3.0.2
 
 [options]
-sfml/*:audio=False
+sfml/*:audio=True
 sfml/*:network=False
 
 [generators]

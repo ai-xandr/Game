@@ -15,8 +15,9 @@ class World {
     void update(float deltaTime, sf::Vector2f diverPos, const sf::View &cameraView);
     void draw(sf::RenderWindow &window, const sf::View &cameraView) const;
     std::vector<Fish *> &getFishes();
-    void handleAttack(sf::Vector2f pos, float range, int damage);
+    int handleAttack(sf::Vector2f pos, float range, int damage);
     int getCoinCount() const;
+    void setCoinCount(int amount);
     float getSeabedY(float x) const;
     void resetAround(sf::Vector2f center);
     const std::vector<Rock> &getRocks() const {

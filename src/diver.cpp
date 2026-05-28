@@ -1,6 +1,7 @@
 #include "diver.hpp"
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 
 namespace Game {
 
@@ -165,7 +166,15 @@ float Diver::getAttackRange() const {
 }
 
 int Diver::getAttackDamage() const {
-    return m_attackDamage;
+    return std::max(1, static_cast<int>(std::lround(m_baseAttackDamage * m_damageMultiplier)));
+}
+
+void Diver::setCooldownReduction(float reduction) {
+    m_cooldownReduction = std::clamp(reduction, 0.f, 0.9f);
+}
+
+void Diver::setDamageMultiplier(float multiplier) {
+    m_damageMultiplier = std::max(1.f, multiplier);
 }
 
 void Diver::resetVelocity() {

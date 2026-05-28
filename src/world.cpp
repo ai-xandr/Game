@@ -229,14 +229,23 @@ std::vector<Fish *> &World::getFishes() {
     return m_fishes;
 }
 
-void World::handleAttack(sf::Vector2f pos, float range, int damage) {
-    for (auto f : m_fishes)
-        if (f->isColliding(pos, range))
+int World::handleAttack(sf::Vector2f pos, float range, int damage) {
+    int hits = 0;
+    for (auto f : m_fishes) {
+        if (f->isColliding(pos, range)) {
             f->takeDamage(damage);
+            ++hits;
+        }
+    }
+    return hits;
 }
 
 int World::getCoinCount() const {
     return m_collectedCoins;
+}
+
+void World::setCoinCount(int amount) {
+    m_collectedCoins = std::max(0, amount);
 }
 
 float World::getSeabedY(float x) const {
