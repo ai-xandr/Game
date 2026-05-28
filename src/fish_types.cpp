@@ -19,6 +19,8 @@ GoldFish::GoldFish(sf::Vector2f startPos) : Fish(startPos, 60.f, 3, FishType::Pr
     m_sprite.setPosition(m_position);
     m_sprite.setOrigin({fishW.x / 2.f, fishW.y / 2.f});
     m_velocity = sf::Vector2f(m_speed, 0.f);
+
+    m_health = 1;
 }
 
 void GoldFish::update(float deltaTime, sf::Vector2f diverPos,
@@ -33,9 +35,7 @@ void GoldFish::update(float deltaTime, sf::Vector2f diverPos,
     m_position += m_velocity * deltaTime;
 
     m_wobbleTime += deltaTime;
-    float wobble =
-        std::sin(m_wobbleTime * 8.f) * 0.04f; // тут можно поэксперементировать с эффектом "ряби",
-                                              // первое значение - частота, вторая - амплитуда
+    float wobble = std::sin(m_wobbleTime * 8.f) * 0.04f;
 
     if (m_velocity.x < -0.1f)
         m_sprite.setScale({-m_baseScale, m_baseScale * (1.f + wobble)});
@@ -70,6 +70,8 @@ Tuna::Tuna(sf::Vector2f startPos) : Fish(startPos, 90.f, 5, FishType::Prey) {
     m_sprite.setPosition(m_position);
     m_sprite.setOrigin({fishW.x / 2.f, fishW.y / 2.f});
     m_velocity = sf::Vector2f(m_speed, 0.f);
+
+    m_health = 2;
 }
 
 void Tuna::update(float deltaTime, sf::Vector2f diverPos, const std::vector<Fish *> &allFishes) {
@@ -116,6 +118,8 @@ Shark::Shark(sf::Vector2f startPos) : Fish(startPos, 150.f, 15, FishType::Predat
     m_sprite.setPosition(m_position);
     m_sprite.setOrigin({fishW.x / 2.f, fishW.y / 2.f});
     m_velocity = sf::Vector2f(m_speed, 0.f);
+
+    m_health = 3;
 }
 
 void Shark::update(float deltaTime, sf::Vector2f diverPos, const std::vector<Fish *> &allFishes) {

@@ -1,7 +1,6 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 
-#include "coin.hpp"
 #include "common.hpp"
 #include "rock.hpp"
 #include <random>
@@ -26,7 +25,6 @@ class World {
 
   private:
     std::vector<Fish *> m_fishes;
-    std::vector<Coin> m_coins;
     sf::FloatRect m_bounds;
     float m_spawnTimer = 0.f;
     float m_spawnInterval = 0.3f;

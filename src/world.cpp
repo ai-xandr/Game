@@ -182,31 +182,12 @@ void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &camer
         const sf::Vector2f p = f->getPosition();
         const bool outOfScreenSpace = !cullRect.contains(p);
         if (f->isDead()) {
-            Coin c;
-            c.pos = f->getPosition();
-            c.value = f->getPoints();
-            m_coins.push_back(c);
+            m_collectedCoins += f->getPoints();
             delete f;
             it = m_fishes.erase(it);
         } else if (outOfScreenSpace) {
             delete f;
             it = m_fishes.erase(it);
-        } else {
-            ++it;
-        }
-    }
-
-    for (auto it = m_coins.begin(); it != m_coins.end();) {
-        it->update(deltaTime);
-        float dx = it->pos.x - diverPos.x;
-        float dy = it->pos.y - diverPos.y;
-        float dist2 = dx * dx + dy * dy;
-        float collectRadius = it->radius + PLAYER_RADIUS;
-        if (dist2 <= collectRadius * collectRadius) {
-            m_collectedCoins += it->value;
-            it = m_coins.erase(it);
-        } else if (it->lifetime <= 0.f) {
-            it = m_coins.erase(it);
         } else {
             ++it;
         }
@@ -242,8 +223,6 @@ void World::draw(sf::RenderWindow &window, const sf::View &cameraView) const {
     }
     for (auto f : m_fishes)
         f->draw(window);
-    for (const auto &c : m_coins)
-        c.draw(window);
 }
 
 std::vector<Fish *> &World::getFishes() {
@@ -271,7 +250,6 @@ void World::resetAround(sf::Vector2f center) {
     for (auto *f : m_fishes)
         delete f;
     m_fishes.clear();
-    m_coins.clear();
     m_rocks.clear();
     m_spawnTimer = 0.f;
 
