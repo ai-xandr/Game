@@ -13,7 +13,7 @@ Diver::Diver(sf::Vector2f startPos)
     m_sprite.setFrameCount(3);
     m_sprite.setPingPong(true);
     m_sprite.setFrameSize({765.f, 1528.f});
-    m_sprite.setFrameTime(0.75f);
+    m_sprite.setFrameTime(0.5f);
     constexpr float targetHeight = 200.f;
     const float uniformScale = targetHeight / 1528.f;
     m_baseScale = uniformScale;
