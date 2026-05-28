@@ -123,8 +123,8 @@ void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &camer
         m_spawnTimer = m_spawnInterval * (0.45f + m_dist01(m_rng) * 0.35f);
     }
 
-    const float viewMargin = 300.f;  // внутри этой зоны камни НЕ спавнятся
-    const float spawnMargin = 500.f; // а в этой зоне они могут появиться
+    const float viewMargin = 300.f;
+    const float spawnMargin = 500.f;
 
     sf::FloatRect safeRect = visibleRect;
     safeRect.position -= sf::Vector2f(viewMargin, viewMargin);
@@ -244,7 +244,6 @@ void World::draw(sf::RenderWindow &window, const sf::View &cameraView) const {
         f->draw(window);
     for (const auto &c : m_coins)
         c.draw(window);
-
 }
 
 std::vector<Fish *> &World::getFishes() {

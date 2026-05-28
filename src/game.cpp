@@ -20,7 +20,7 @@ bool Game::isPointInside(sf::Vector2f point, const sf::FloatRect &rect) const {
 }
 
 Game::Game()
-    : m_window(sf::VideoMode({800, 600}), "Underwater Game", sf::Style::Default),
+    : m_window(sf::VideoMode({800, 600}), "David the Vodolaz", sf::Style::Default),
       m_camera(sf::FloatRect({0.f, 0.f}, {2000.f, 2000.f}), {800.f, 600.f}),
       m_diver(sf::Vector2f(1000.f, 1000.f)), m_world(sf::FloatRect({0.f, 0.f}, {2000.f, 2000.f})) {
     m_window.setFramerateLimit(60);
