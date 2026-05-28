@@ -10,6 +10,7 @@ class Camera {
     Camera(sf::FloatRect worldBounds, sf::Vector2f viewSize);
     void update(sf::Vector2f target);
     sf::View getView() const;
+    void setViewSize(sf::Vector2f size);
 
   private:
     sf::View m_view;
