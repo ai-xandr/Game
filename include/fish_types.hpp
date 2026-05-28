@@ -18,6 +18,7 @@ class GoldFish : public Fish {
 
   private:
     AnimatedSprite m_sprite;
+    float m_baseScale = 1.0f;
 };
 
 class Tuna : public Fish {
