@@ -28,6 +28,7 @@ World::World(sf::FloatRect bounds) : m_bounds(bounds) {
         else
             m_fishes.push_back(new GoldFish(pos));
     }
+    spawnInitialRocks();
 }
 
 World::~World() {
@@ -86,6 +87,16 @@ void World::spawnRandomFish(const sf::FloatRect &visibleRect) {
         else
             fish->setHorizontalDirection(m_dist01(m_rng) < 0.5f ? -1.f : 1.f);
         m_fishes.push_back(fish);
+    }
+}
+
+void World::spawnInitialRocks() {
+    const int numRocks = 15;
+    for (int i = 0; i < numRocks; ++i) {
+        float x = m_dist01(m_rng) * WORLD_WIDTH;
+        float y = m_dist01(m_rng) * WORLD_HEIGHT;
+        float radius = 40.f + m_dist01(m_rng) * 100.f;
+        m_rocks.emplace_back(sf::Vector2f(x, y), radius);
     }
 }
 
@@ -179,10 +190,14 @@ void World::draw(sf::RenderWindow &window, const sf::View &cameraView) const {
     }
     window.draw(seabed);
 
+    for (const auto &rock : m_rocks) {
+        rock.draw(window);
+    }
     for (auto f : m_fishes)
         f->draw(window);
     for (const auto &c : m_coins)
         c.draw(window);
+
 }
 
 std::vector<Fish *> &World::getFishes() {
@@ -211,7 +226,9 @@ void World::resetAround(sf::Vector2f center) {
         delete f;
     m_fishes.clear();
     m_coins.clear();
+    m_rocks.clear();
     m_spawnTimer = 0.f;
+    spawnInitialRocks();
 
     const sf::FloatRect seedRect(center - sf::Vector2f(400.f, 300.f), sf::Vector2f(800.f, 600.f));
     const int initialCount = m_targetFishMin;
