@@ -106,6 +106,22 @@ void Game::processEvents() {
     while (auto ev = m_window.pollEvent()) {
         if (ev->is<sf::Event::Closed>())
             m_window.close();
+        if (const auto *resizeEvt = ev->getIf<sf::Event::Resized>()) {
+            float windowRatio = static_cast<float>(resizeEvt->size.x) / resizeEvt->size.y;
+            float worldRatio = WORLD_WIDTH / static_cast<float>(WORLD_HEIGHT);
+            sf::FloatRect visibleArea;
+            if (windowRatio > worldRatio) {
+                float width = WORLD_HEIGHT * windowRatio;
+                float x = (WORLD_WIDTH - width) / 2.f;
+                visibleArea = sf::FloatRect({x, 0.f}, {width, static_cast<float>(WORLD_HEIGHT)});
+            } else {
+                float height = WORLD_WIDTH / windowRatio;
+                float y = (WORLD_HEIGHT - height) / 2.f;
+                visibleArea = sf::FloatRect({0.f, y}, {static_cast<float>(WORLD_WIDTH), height});
+            }
+            m_camera.setViewSize(visibleArea.size);
+            m_camera.update(m_diver.getPosition());
+        }
         if (const auto *mb = ev->getIf<sf::Event::MouseButtonPressed>()) {
             if (mb->button == sf::Mouse::Button::Left) {
                 const sf::Vector2f click(static_cast<float>(mb->position.x),
@@ -128,6 +144,22 @@ void Game::processEvents() {
     while (m_window.pollEvent(event)) {
         if (event.type == sf::Event::Closed)
             m_window.close();
+        if (event.type == sf::Event::Resized) {
+            float windowRatio = static_cast<float>(resizeEvt->size.x) / resizeEvt->size.y;
+            float worldRatio = WORLD_WIDTH / static_cast<float>(WORLD_HEIGHT);
+            sf::FloatRect visibleArea;
+            if (windowRatio > worldRatio) {
+                float width = WORLD_HEIGHT * windowRatio;
+                float x = (WORLD_WIDTH - width) / 2.f;
+                visibleArea = sf::FloatRect({x, 0.f}, {width, static_cast<float>(WORLD_HEIGHT)});
+            } else {
+                float height = WORLD_WIDTH / windowRatio;
+                float y = (WORLD_HEIGHT - height) / 2.f;
+                visibleArea = sf::FloatRect({0.f, y}, {static_cast<float>(WORLD_WIDTH), height});
+            }
+            m_camera.setViewSize(visibleArea.size);
+            m_camera.update(m_diver.getPosition());
+        }
         if (event.type == sf::Event::MouseButtonPressed &&
             event.mouseButton.button == sf::Mouse::Left) {
             const sf::Vector2f click(static_cast<float>(event.mouseButton.x),
