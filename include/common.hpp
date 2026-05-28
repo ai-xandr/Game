@@ -61,6 +61,8 @@ class Fish {
     int m_health = 1;
     int m_points;
     FishType m_type;
+    float m_baseScale = 1.0f;
+    float m_wobbleTime = 0.f;
 };
 
 } // namespace Game

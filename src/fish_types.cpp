@@ -6,13 +6,18 @@
 namespace Game {
 
 GoldFish::GoldFish(sf::Vector2f startPos) : Fish(startPos, 60.f, 3, FishType::Prey) {
-    m_sprite.loadFromFile("assets/sprites/fish/fish.png");
-    const unsigned int fishW = m_sprite.getTextureSize().x;
-    m_sprite.setFrameCount(std::max(1u, fishW / 40u));
-    m_sprite.setFrameSize({40.f, 40.f});
-    m_sprite.setFrameTime(0.14f);
+    m_sprite.loadFromFile("assets/leha_vodnik/fish1.png");
+    sf::Vector2u fishW = m_sprite.getTextureSize();
+    m_sprite.setFrameCount(1);
+    m_sprite.setFrameSize({static_cast<float>(fishW.x), static_cast<float>(fishW.y)});
+    m_sprite.setFrameTime(0.f);
+
+    const float targetWidth = 80.f;
+    m_baseScale = targetWidth / fishW.x;
+    m_sprite.setScale({m_baseScale, m_baseScale});
+
     m_sprite.setPosition(m_position);
-    m_sprite.setOrigin({20.f, 20.f});
+    m_sprite.setOrigin({fishW.x / 2.f, fishW.y / 2.f});
     m_velocity = sf::Vector2f(m_speed, 0.f);
 }
 
@@ -27,10 +32,15 @@ void GoldFish::update(float deltaTime, sf::Vector2f diverPos,
     }
     m_position += m_velocity * deltaTime;
 
+    m_wobbleTime += deltaTime;
+    float wobble =
+        std::sin(m_wobbleTime * 8.f) * 0.04f; // тут можно поэксперементировать с эффектом "ряби",
+                                              // первое значение - частота, вторая - амплитуда
+
     if (m_velocity.x < -0.1f)
-        m_sprite.setScale({-1.f, 1.f});
+        m_sprite.setScale({-m_baseScale, m_baseScale * (1.f + wobble)});
     else if (m_velocity.x > 0.1f)
-        m_sprite.setScale({1.f, 1.f});
+        m_sprite.setScale({m_baseScale, m_baseScale * (1.f + wobble)});
 
     m_sprite.setPosition(m_position);
     m_sprite.update(deltaTime);
@@ -48,28 +58,35 @@ bool GoldFish::isColliding(sf::Vector2f point, float radius) const {
 }
 
 Tuna::Tuna(sf::Vector2f startPos) : Fish(startPos, 90.f, 5, FishType::Prey) {
-    m_sprite.loadFromFile("assets/sprites/fish/fish-big.png");
-    const unsigned int fishW = m_sprite.getTextureSize().x;
-    m_sprite.setFrameCount(std::max(1u, fishW / 50u));
-    m_sprite.setFrameSize({50.f, 40.f});
-    m_sprite.setFrameTime(0.1f);
+    m_sprite.loadFromFile("assets/leha_vodnik/fish2.png");
+    sf::Vector2u fishW = m_sprite.getTextureSize();
+    m_sprite.setFrameCount(1);
+    m_sprite.setFrameSize({static_cast<float>(fishW.x), static_cast<float>(fishW.y)});
+    m_sprite.setFrameTime(0.f);
+    const float targetWidth = 100.f;
+    m_baseScale = targetWidth / fishW.x;
+    m_sprite.setScale({m_baseScale, m_baseScale});
+
     m_sprite.setPosition(m_position);
-    m_sprite.setOrigin({25.f, 20.f});
+    m_sprite.setOrigin({fishW.x / 2.f, fishW.y / 2.f});
     m_velocity = sf::Vector2f(m_speed, 0.f);
 }
 
 void Tuna::update(float deltaTime, sf::Vector2f diverPos, const std::vector<Fish *> &allFishes) {
     const float t = m_position.x * 0.007f + m_position.y * 0.017f;
     m_velocity.y = std::sin(t) * 35.f;
-    if (std::abs(diverPos.x - m_position.x) < 180.f) {
+    if (std::abs(diverPos.x - m_position.x) < 140.f) {
         m_velocity.x = (m_position.x < diverPos.x ? -m_speed : m_speed) * 1.3f;
     }
     m_position += m_velocity * deltaTime;
 
+    m_wobbleTime += deltaTime;
+    float wobble = std::sin(m_wobbleTime * 7.f) * 0.03f; // тут так же можно поэксперементировать
+
     if (m_velocity.x < -0.1f)
-        m_sprite.setScale({-1.f, 1.f});
+        m_sprite.setScale({-m_baseScale, m_baseScale * (1.f + wobble)});
     else if (m_velocity.x > 0.1f)
-        m_sprite.setScale({1.f, 1.f});
+        m_sprite.setScale({m_baseScale, m_baseScale * (1.f + wobble)});
 
     m_sprite.setPosition(m_position);
     m_sprite.update(deltaTime);
@@ -87,14 +104,18 @@ bool Tuna::isColliding(sf::Vector2f point, float radius) const {
 }
 
 Shark::Shark(sf::Vector2f startPos) : Fish(startPos, 150.f, 15, FishType::Predator) {
-    m_sprite.loadFromFile("assets/sprites/fish/mine-big.png");
-    const unsigned int fishW = m_sprite.getTextureSize().x;
-    m_sprite.setFrameCount(std::max(1u, fishW / 60u));
-    m_sprite.setFrameSize({60.f, 50.f});
-    m_sprite.setFrameTime(0.09f);
+    m_sprite.loadFromFile("assets/leha_vodnik/fish3.png");
+    sf::Vector2u fishW = m_sprite.getTextureSize();
+    m_sprite.setFrameCount(1);
+    m_sprite.setFrameSize({static_cast<float>(fishW.x), static_cast<float>(fishW.y)});
+    m_sprite.setFrameTime(0.f);
+    const float targetWidth = 260.f;
+    m_baseScale = targetWidth / fishW.x;
+    m_sprite.setScale({m_baseScale, m_baseScale});
+
     m_sprite.setPosition(m_position);
-    m_sprite.setOrigin({30.f, 25.f});
-    m_velocity = sf::Vector2f(m_speed * 0.8f, 0.f);
+    m_sprite.setOrigin({fishW.x / 2.f, fishW.y / 2.f});
+    m_velocity = sf::Vector2f(m_speed, 0.f);
 }
 
 void Shark::update(float deltaTime, sf::Vector2f diverPos, const std::vector<Fish *> &allFishes) {
@@ -116,10 +137,13 @@ void Shark::update(float deltaTime, sf::Vector2f diverPos, const std::vector<Fis
 
     m_position += m_velocity * deltaTime;
 
-    if (m_velocity.x < -0.1f)
-        m_sprite.setScale({-1.f, 1.f});
-    else if (m_velocity.x > 0.1f)
-        m_sprite.setScale({1.f, 1.f});
+    m_wobbleTime += deltaTime;
+    float wobble = std::sin(m_wobbleTime * 6.f) * 0.035f; // тут так же можно поэксперементировать
+
+    if (m_velocity.x > 0.1f)
+        m_sprite.setScale({-m_baseScale, m_baseScale * (1.f + wobble)});
+    else if (m_velocity.x < -0.1f)
+        m_sprite.setScale({m_baseScale, m_baseScale * (1.f + wobble)});
 
     m_sprite.setPosition(m_position);
     m_sprite.update(deltaTime);
