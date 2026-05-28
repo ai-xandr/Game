@@ -3,7 +3,6 @@
 
 #include "animated_sprite.hpp"
 #include <SFML/Graphics.hpp>
-#include <memory>
 
 namespace Game {
 
@@ -41,6 +40,10 @@ class Diver {
 
     AnimatedSprite m_sprite;
     int m_currentState = 0;
+    int m_appliedAnimationState = -1;
+
+    float m_baseScale = 1.0f;
+    float m_swimScaleFactor = 1.3f;
 };
 } // namespace Game
 #endif

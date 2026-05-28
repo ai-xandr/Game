@@ -1,5 +1,4 @@
 #include "diver.hpp"
-#include "common.hpp"
 #include <algorithm>
 #include <cmath>
 
@@ -7,16 +6,20 @@ namespace Game {
 
 Diver::Diver(sf::Vector2f startPos)
     : m_position(startPos), m_velocity(0, 0), m_movingDirection(0, 0) {
-    if (!m_sprite.loadFromFile("assets/sprites/diver/player-idle.png")) {
-        if (!m_sprite.loadFromFile("assets/sprites/diver/player-swiming.png")) {
-            m_sprite.loadFromFile("assets/sprites/diver/player-fast.png");
-        }
+    if (!m_sprite.loadFromFile("assets/leha_vodnik/spritesheet_diver.png")) {
+        m_sprite.loadFromFile("assets/spritesheet_diver.png");
     }
-    m_sprite.setFrameCount(std::max(1u, m_sprite.getTextureSize().x / 64u));
-    m_sprite.setFrameSize({64.f, 64.f});
-    m_sprite.setFrameTime(0.15f);
+    m_sprite.setFrameStart(0);
+    m_sprite.setFrameCount(3);
+    m_sprite.setPingPong(true);
+    m_sprite.setFrameSize({765.f, 1528.f});
+    m_sprite.setFrameTime(0.75f);
+    constexpr float targetHeight = 200.f;
+    const float uniformScale = targetHeight / 1528.f;
+    m_baseScale = uniformScale;
+    m_sprite.setScale({uniformScale, uniformScale});
     m_sprite.setPosition(m_position);
-    m_sprite.setOrigin({32.f, 32.f});
+    m_sprite.setOrigin({765.f * 0.5f, 1528.f * 0.5f});
 }
 
 void Diver::handleInput() {
@@ -81,13 +84,29 @@ void Diver::update(float deltaTime, float seabedY) {
 
     if (std::abs(m_velocity.x) > 1.f || std::abs(m_velocity.y) > 1.f) {
         float angle = std::atan2(m_velocity.y, m_velocity.x) * 180.f / 3.14159f;
-        m_sprite.setRotation(angle);
+        m_sprite.setRotation(angle + 90.f);
     }
 
     if (m_attacking) {
         m_attackTimer -= deltaTime;
         if (m_attackTimer <= 0.0f)
             m_attacking = false;
+    }
+
+    if (m_appliedAnimationState != m_currentState) {
+        if (m_currentState == 0) {
+            m_sprite.setScale({m_baseScale, m_baseScale});
+            m_sprite.setFrameStart(0); // frame_idle_0..2
+            m_sprite.setFrameCount(3);
+            m_sprite.setPingPong(true);
+        } else {
+            float swimScale = m_baseScale * m_swimScaleFactor;
+            m_sprite.setScale({swimScale, swimScale});
+            m_sprite.setFrameStart(3); // frame_swim_0..3
+            m_sprite.setFrameCount(4);
+            m_sprite.setPingPong(true);
+        }
+        m_appliedAnimationState = m_currentState;
     }
 
     m_sprite.update(deltaTime);
