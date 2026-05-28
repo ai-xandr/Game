@@ -23,6 +23,8 @@ class Diver {
 
     float getAttackRange() const;
     int getAttackDamage() const;
+    void setCooldownReduction(float reduction);
+    void setDamageMultiplier(float multiplier);
 
   private:
     sf::Vector2f m_position;
@@ -34,8 +36,11 @@ class Diver {
     float m_waterFading = 0.87f;
 
     int m_hp = 10;
-    int m_attackDamage = 1;
+    int m_baseAttackDamage = 1;
     float m_attackRange = 48.0f;
+    float m_cooldownReduction = 0.f;
+    float m_damageMultiplier = 1.f;
+    static constexpr float m_baseAttackCooldown = 0.25f;
     bool m_attacking = false;
     float m_attackTimer = 0.0f;
     float m_attackCooldown = 0.f;
