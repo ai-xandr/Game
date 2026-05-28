@@ -21,6 +21,8 @@ class Game {
     void startNewRun();
     sf::FloatRect getCenterButtonRect(sf::Vector2f size, float yOffset) const;
     bool isPointInside(sf::Vector2f point, const sf::FloatRect &rect) const;
+    float m_damageVignetteAlpha = 0.f;
+    sf::RectangleShape m_vignette;
 
     sf::RenderWindow m_window;
     Camera m_camera;
