@@ -123,6 +123,53 @@ void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &camer
         m_spawnTimer = m_spawnInterval * (0.45f + m_dist01(m_rng) * 0.35f);
     }
 
+    const float viewMargin = 300.f;  // внутри этой зоны камни НЕ спавнятся
+    const float spawnMargin = 500.f; // а в этой зоне они могут появиться
+
+    sf::FloatRect safeRect = visibleRect;
+    safeRect.position -= sf::Vector2f(viewMargin, viewMargin);
+    safeRect.size += sf::Vector2f(viewMargin * 2.f, viewMargin * 2.f);
+
+    sf::FloatRect spawnRect = visibleRect;
+    spawnRect.position -= sf::Vector2f(spawnMargin, spawnMargin);
+    spawnRect.size += sf::Vector2f(spawnMargin * 2.f, spawnMargin * 2.f);
+
+    const float removalMargin = 800.f;
+    sf::FloatRect removalRect = visibleRect;
+    removalRect.position -= sf::Vector2f(removalMargin, removalMargin);
+    removalRect.size += sf::Vector2f(removalMargin * 2.f, removalMargin * 2.f);
+
+    m_rocks.erase(std::remove_if(m_rocks.begin(), m_rocks.end(),
+                                 [&removalRect](const Rock &r) {
+                                     return !removalRect.contains(r.getPosition());
+                                 }),
+                  m_rocks.end());
+
+    int activeRocks = 0;
+    for (const auto &rock : m_rocks) {
+        if (spawnRect.contains(rock.getPosition()))
+            ++activeRocks;
+    }
+
+    const int minRocks = 20;
+    int toSpawn = minRocks - activeRocks;
+    for (int i = 0; i < toSpawn; ++i) {
+        sf::Vector2f point;
+        bool valid = false;
+        for (int attempts = 0; attempts < 50; ++attempts) {
+            float x = spawnRect.position.x + m_dist01(m_rng) * spawnRect.size.x;
+            float y = spawnRect.position.y + m_dist01(m_rng) * spawnRect.size.y;
+            point = {x, y};
+            if (!safeRect.contains(point)) {
+                valid = true;
+                break;
+            }
+        }
+        if (!valid)
+            continue;
+        float radius = 40.f + m_dist01(m_rng) * 100.f;
+        m_rocks.emplace_back(point, radius);
+    }
     for (auto f : m_fishes)
         f->update(deltaTime, diverPos, m_fishes);
 
@@ -228,7 +275,6 @@ void World::resetAround(sf::Vector2f center) {
     m_coins.clear();
     m_rocks.clear();
     m_spawnTimer = 0.f;
-    spawnInitialRocks();
 
     const sf::FloatRect seedRect(center - sf::Vector2f(400.f, 300.f), sf::Vector2f(800.f, 600.f));
     const int initialCount = m_targetFishMin;
