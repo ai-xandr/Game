@@ -6,17 +6,30 @@ namespace Game {
 
 AnimatedSprite::AnimatedSprite()
     : m_sprite(m_texture), m_frameSize(50.f, 50.f), m_frameTime(0.1f), m_elapsed(0.f),
-      m_frameCount(1), m_currentFrame(0) {
+      m_frameStart(0), m_frameCount(1), m_currentFrame(0), m_frameDirection(1), m_pingPong(false) {
 }
 
 bool AnimatedSprite::loadFromFile(const std::string &filename) {
     return m_texture.loadFromFile(filename);
 }
 
-void AnimatedSprite::setFrameCount(int count) {
-    m_frameCount = count;
+void AnimatedSprite::setFrameStart(int startIndex) {
+    m_frameStart = std::max(0, startIndex);
     m_currentFrame = 0;
     m_elapsed = 0.f;
+    m_frameDirection = 1;
+}
+
+void AnimatedSprite::setFrameCount(int count) {
+    m_frameCount = std::max(1, count);
+    m_currentFrame = 0;
+    m_elapsed = 0.f;
+    m_frameDirection = 1;
+}
+
+void AnimatedSprite::setPingPong(bool enabled) {
+    m_pingPong = enabled;
+    m_frameDirection = 1;
 }
 
 void AnimatedSprite::setFrameSize(sf::Vector2f size) {
@@ -55,7 +68,16 @@ void AnimatedSprite::update(float deltaTime) {
     m_elapsed += deltaTime;
     if (m_elapsed >= m_frameTime && m_frameCount > 1) {
         m_elapsed -= m_frameTime;
-        m_currentFrame = (m_currentFrame + 1) % m_frameCount;
+        if (m_pingPong && m_frameCount > 2) {
+            if (m_currentFrame >= m_frameCount - 1) {
+                m_frameDirection = -1;
+            } else if (m_currentFrame <= 0) {
+                m_frameDirection = 1;
+            }
+            m_currentFrame += m_frameDirection;
+        } else {
+            m_currentFrame = (m_currentFrame + 1) % m_frameCount;
+        }
     }
 
     m_sprite.setTexture(m_texture, true);
@@ -69,7 +91,9 @@ void AnimatedSprite::update(float deltaTime) {
         frameH =
             std::max(1, std::min(static_cast<int>(m_frameSize.y), static_cast<int>(texSize.y)));
         const int maxFramesByWidth = std::max(1, static_cast<int>(texSize.x) / frameW);
-        frameX = (m_currentFrame % maxFramesByWidth) * frameW;
+        const int frameIndex = m_frameStart + m_currentFrame;
+        frameX = (frameIndex % maxFramesByWidth) * frameW;
+        frameY = (frameIndex / maxFramesByWidth) * frameH;
     }
 #if defined(SFML_VERSION_MAJOR) && (SFML_VERSION_MAJOR >= 3)
     sf::IntRect rect(sf::Vector2i(frameX, frameY), sf::Vector2i(frameW, frameH));

@@ -10,7 +10,9 @@ class AnimatedSprite {
     AnimatedSprite();
 
     bool loadFromFile(const std::string &filename);
+    void setFrameStart(int startIndex);
     void setFrameCount(int count);
+    void setPingPong(bool enabled);
     void setFrameSize(sf::Vector2f size);
     void setFrameTime(float time);
     void setPosition(sf::Vector2f pos);
@@ -34,8 +36,11 @@ class AnimatedSprite {
     sf::Vector2f m_frameSize;
     float m_frameTime;
     float m_elapsed;
+    int m_frameStart;
     int m_frameCount;
     int m_currentFrame;
+    int m_frameDirection;
+    bool m_pingPong;
 };
 
 } // namespace Game
