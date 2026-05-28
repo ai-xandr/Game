@@ -42,6 +42,9 @@ Game::Game()
     m_hasUiFont = m_uiFont.openFromFile("C:/Windows/Fonts/arial.ttf");
     if (!m_hasUiFont)
         m_hasUiFont = m_uiFont.openFromFile("C:/Windows/Fonts/segoeui.ttf");
+    m_vignette.setSize(sf::Vector2f(static_cast<float>(m_window.getSize().x),
+                                    static_cast<float>(m_window.getSize().y)));
+    m_vignette.setFillColor(sf::Color(255, 0, 0, 0));
 }
 
 void Game::startNewRun() {
@@ -162,12 +165,16 @@ void Game::update(float deltaTime) {
                 fish->isColliding(m_diver.getPosition(), PLAYER_RADIUS) &&
                 m_diverDamageCooldown <= 0.f) {
                 m_diver.takeDamage(1);
+                m_damageVignetteAlpha = 0.5f;
                 m_diverDamageCooldown = 0.8f;
                 if (m_diver.isDead()) {
                     m_state = GameOver;
                     break;
                 }
             }
+        }
+        if (m_damageVignetteAlpha > 0.f) {
+            m_damageVignetteAlpha = std::max(0.f, m_damageVignetteAlpha - deltaTime * 5.f);
         }
 
 #if defined(SFML_VERSION_MAJOR) && (SFML_VERSION_MAJOR >= 3)
@@ -288,6 +295,12 @@ void Game::render() {
             m_window.draw(marker);
         }
     }
+    m_window.setView(m_window.getDefaultView());
+    m_vignette.setSize(sf::Vector2f(static_cast<float>(m_window.getSize().x),
+                                    static_cast<float>(m_window.getSize().y)));
+    m_vignette.setFillColor(
+        sf::Color(255, 0, 0, static_cast<uint8_t>(m_damageVignetteAlpha * 255)));
+    m_window.draw(m_vignette);
 
     m_window.display();
 }
