@@ -37,6 +37,7 @@ class Game {
     State m_state = MainMenu;
     float m_diverDamageCooldown = 0.f;
     float m_menuOverlayAlpha = 0.f;
+    std::unique_ptr<sf::Text> m_coinText;
     void drawParallaxLayer(const sf::Texture &texture, const sf::View &view, float parallax,
                            sf::Color tint, bool mirror);
 };

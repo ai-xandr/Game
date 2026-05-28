@@ -45,6 +45,11 @@ Game::Game()
     m_vignette.setSize(sf::Vector2f(static_cast<float>(m_window.getSize().x),
                                     static_cast<float>(m_window.getSize().y)));
     m_vignette.setFillColor(sf::Color(255, 0, 0, 0));
+    if (m_hasUiFont) {
+        m_coinText = std::make_unique<sf::Text>(m_uiFont, "", 24);
+        m_coinText->setFillColor(sf::Color::Yellow);
+        m_coinText->setPosition({20.f, 20.f});
+    }
 }
 
 void Game::startNewRun() {
@@ -248,12 +253,6 @@ void Game::render() {
     }
 
     m_window.setView(m_window.getDefaultView());
-    // Minimal UI: draw coin icon only (no text) to avoid font dependency
-    sf::CircleShape coinIcon(8.f);
-    coinIcon.setFillColor(sf::Color::Yellow);
-    coinIcon.setOrigin(sf::Vector2f(8.f, 8.f));
-    coinIcon.setPosition(sf::Vector2f(20.f, 20.f));
-    m_window.draw(coinIcon);
     if (m_menuOverlayAlpha > 1.f) {
         sf::RectangleShape overlay;
         overlay.setSize(sf::Vector2f(static_cast<float>(m_window.getSize().x),
@@ -314,6 +313,11 @@ void Game::render() {
     m_vignette.setFillColor(
         sf::Color(255, 0, 0, static_cast<uint8_t>(m_damageVignetteAlpha * 255)));
     m_window.draw(m_vignette);
+
+    if (m_coinText) {
+        m_coinText->setString("Points: " + std::to_string(m_world.getCoinCount()));
+        m_window.draw(*m_coinText);
+    }
 
     m_window.display();
 }
