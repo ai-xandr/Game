@@ -11,7 +11,7 @@ class Diver {
     Diver(sf::Vector2f startPos);
     void handleInput();
     void update(float deltaTime, float seabedY);
-    void attack();
+    bool attack();
     void draw(sf::RenderWindow &window) const;
     sf::Vector2f getPosition() const;
     void setPosition(sf::Vector2f pos);
@@ -38,6 +38,8 @@ class Diver {
     float m_attackRange = 48.0f;
     bool m_attacking = false;
     float m_attackTimer = 0.0f;
+    float m_attackCooldown = 0.f;
+    static constexpr float ATTACK_COOLDOWN = 0.5f;
 
     AnimatedSprite m_sprite;
     int m_currentState = 0;

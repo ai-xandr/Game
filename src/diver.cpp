@@ -87,6 +87,9 @@ void Diver::update(float deltaTime, float seabedY) {
         m_sprite.setRotation(angle + 90.f);
     }
 
+    if (m_attackCooldown > 0.f)
+        m_attackCooldown -= deltaTime;
+
     if (m_attacking) {
         m_attackTimer -= deltaTime;
         if (m_attackTimer <= 0.0f)
@@ -112,11 +115,14 @@ void Diver::update(float deltaTime, float seabedY) {
     m_sprite.update(deltaTime);
 }
 
-void Diver::attack() {
-    if (!m_attacking) {
+bool Diver::attack() {
+    if (!m_attacking && m_attackCooldown <= 0.f) {
         m_attacking = true;
         m_attackTimer = 0.25f;
+        m_attackCooldown = ATTACK_COOLDOWN;
+        return true;
     }
+    return false;
 }
 
 void Diver::draw(sf::RenderWindow &window) const {

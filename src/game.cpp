@@ -229,9 +229,10 @@ void Game::update(float deltaTime) {
 
 #if defined(SFML_VERSION_MAJOR) && (SFML_VERSION_MAJOR >= 3)
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
-            m_diver.attack();
-            m_world.handleAttack(m_diver.getPosition(), m_diver.getAttackRange(),
-                                 m_diver.getAttackDamage());
+            if (m_diver.attack()) {
+                m_world.handleAttack(m_diver.getPosition(), m_diver.getAttackRange(),
+                                     m_diver.getAttackDamage());
+            }
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
@@ -248,7 +249,7 @@ void Game::update(float deltaTime) {
 #endif
     } else if (m_state == Paused) {
         m_camera.update(m_diver.getPosition());
-        // Enter / Return handling depends on SFML version
+
 #if defined(SFML_VERSION_MAJOR) && (SFML_VERSION_MAJOR >= 3)
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter))
             m_state = Playing;
