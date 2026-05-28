@@ -2,6 +2,7 @@
 #define COMMON_HPP
 
 #include <SFML/Graphics.hpp>
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -9,7 +10,7 @@ namespace Game {
 inline constexpr unsigned int WORLD_WIDTH = 2000;
 inline constexpr unsigned int WORLD_HEIGHT = 2000;
 
-enum class FishType { Prey, Predator };
+enum class FishType { Prey, Predator, Neutral, Obstacle };
 
 struct Upgrade {
     std::string name;
@@ -45,6 +46,12 @@ class Fish {
 
     void takeDamage(int damage) {
         m_health -= damage;
+    }
+    void setHorizontalDirection(float dirX) {
+        if (dirX > 0.f)
+            m_velocity.x = std::abs(m_speed);
+        else if (dirX < 0.f)
+            m_velocity.x = -std::abs(m_speed);
     }
 
   protected:

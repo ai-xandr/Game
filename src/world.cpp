@@ -1,17 +1,222 @@
 #include "world.hpp"
+#include "fish_types.hpp"
+#include "utility.hpp"
+#include <algorithm>
+#include <cmath>
+#include <random>
+#include <vector>
 
 namespace Game {
 
-World::World(sf::FloatRect) {
+World::World(sf::FloatRect bounds) : m_bounds(bounds) {
+    std::random_device rd;
+    m_rng.seed(rd());
+    m_spawnTimer = 0.f;
+    m_spawnInterval = 0.3f;
+    // spawn a few initial fishes near the center so player sees activity immediately
+    sf::Vector2f center(m_bounds.position.x + m_bounds.size.x / 2.f,
+                        m_bounds.position.y + m_bounds.size.y / 2.f);
+    for (int i = 0; i < 16; ++i) {
+        float rx = (m_dist01(m_rng) - 0.5f) * 400.f;
+        float ry = (m_dist01(m_rng) - 0.5f) * 200.f;
+        sf::Vector2f pos = center + sf::Vector2f(rx, ry);
+        float r = m_dist01(m_rng);
+        if (r < 0.5f)
+            m_fishes.push_back(new GoldFish(pos));
+        else if (r < 0.85f)
+            m_fishes.push_back(new Tuna(pos));
+        else
+            m_fishes.push_back(new GoldFish(pos));
+    }
 }
+
 World::~World() {
+    for (auto f : m_fishes)
+        delete f;
 }
-void World::update(float, sf::Vector2f) {
+
+void World::spawnRandomFish(const sf::FloatRect &visibleRect) {
+    float r = m_dist01(m_rng);
+    Fish *fish = nullptr;
+    const int side = static_cast<int>(m_dist01(m_rng) * 4.f); // 0 left, 1 right, 2 top, 3 bottom
+    sf::Vector2f pos;
+    const float spawnMargin = 120.f;
+    const float safeLeft = visibleRect.position.x - 80.f;
+    const float safeRight = visibleRect.position.x + visibleRect.size.x + 80.f;
+    const float safeTop = visibleRect.position.y - 80.f;
+    const float safeBottom = visibleRect.position.y + visibleRect.size.y + 80.f;
+    if (side == 0) {
+        pos.x = visibleRect.position.x - spawnMargin;
+        pos.y = safeTop + m_dist01(m_rng) * (safeBottom - safeTop);
+    } else if (side == 1) {
+        pos.x = visibleRect.position.x + visibleRect.size.x + spawnMargin;
+        pos.y = safeTop + m_dist01(m_rng) * (safeBottom - safeTop);
+    } else if (side == 2) {
+        pos.y = visibleRect.position.y - spawnMargin;
+        pos.x = safeLeft + m_dist01(m_rng) * (safeRight - safeLeft);
+    } else {
+        pos.y = visibleRect.position.y + visibleRect.size.y + spawnMargin;
+        pos.x = safeLeft + m_dist01(m_rng) * (safeRight - safeLeft);
+    }
+
+    auto randomY = [&]() { return safeTop + m_dist01(m_rng) * (safeBottom - safeTop); };
+
+    if (r < 0.4f) {
+        pos.y = randomY();
+        fish = new GoldFish(pos);
+    } else if (r < 0.8f) {
+        pos.y = randomY();
+        fish = new Tuna(pos);
+    } else if (r < 0.9f) {
+        pos.y = getSeabedY(pos.x) - 20.f;
+        fish = new Crab(pos);
+    } else if (r < 0.98f) {
+        pos.y = getSeabedY(pos.x) - 10.f;
+        fish = new Shell(pos);
+    } else {
+        pos.y = randomY();
+        fish = new Shark(pos);
+    }
+
+    if (fish != nullptr) {
+        if (side == 0)
+            fish->setHorizontalDirection(1.f);
+        else if (side == 1)
+            fish->setHorizontalDirection(-1.f);
+        else
+            fish->setHorizontalDirection(m_dist01(m_rng) < 0.5f ? -1.f : 1.f);
+        m_fishes.push_back(fish);
+    }
 }
-void World::draw(sf::RenderWindow &) const {
+
+void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &cameraView) {
+    const sf::Vector2f viewSize = cameraView.getSize();
+    const sf::Vector2f viewCenter = cameraView.getCenter();
+    sf::FloatRect visibleRect(viewCenter - viewSize / 2.f, viewSize);
+
+    int fishesInActiveArea = 0;
+    const float activeMargin = 220.f;
+    sf::FloatRect activeRect(visibleRect.position - sf::Vector2f(activeMargin, activeMargin),
+                             visibleRect.size +
+                                 sf::Vector2f(activeMargin * 2.f, activeMargin * 2.f));
+    for (const auto *f : m_fishes) {
+        if (activeRect.contains(f->getPosition()))
+            ++fishesInActiveArea;
+    }
+
+    m_spawnTimer -= deltaTime;
+    if (m_spawnTimer <= 0.f || fishesInActiveArea < m_targetFishMin) {
+        spawnRandomFish(visibleRect);
+        if (fishesInActiveArea < m_targetFishMin / 2)
+            spawnRandomFish(visibleRect);
+        m_spawnTimer = m_spawnInterval * (0.45f + m_dist01(m_rng) * 0.35f);
+    }
+
+    for (auto f : m_fishes)
+        f->update(deltaTime, diverPos, m_fishes);
+
+    const float cullMargin = 0.f;
+    sf::FloatRect cullRect(visibleRect.position - sf::Vector2f(cullMargin, cullMargin),
+                           visibleRect.size + sf::Vector2f(cullMargin * 2.f, cullMargin * 2.f));
+
+    for (auto it = m_fishes.begin(); it != m_fishes.end();) {
+        Fish *f = *it;
+        const sf::Vector2f p = f->getPosition();
+        const bool outOfScreenSpace = !cullRect.contains(p);
+        if (f->isDead()) {
+            Coin c;
+            c.pos = f->getPosition();
+            c.value = f->getPoints();
+            m_coins.push_back(c);
+            delete f;
+            it = m_fishes.erase(it);
+        } else if (outOfScreenSpace) {
+            delete f;
+            it = m_fishes.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    for (auto it = m_coins.begin(); it != m_coins.end();) {
+        it->update(deltaTime);
+        float dx = it->pos.x - diverPos.x;
+        float dy = it->pos.y - diverPos.y;
+        float dist2 = dx * dx + dy * dy;
+        float collectRadius = it->radius + PLAYER_RADIUS;
+        if (dist2 <= collectRadius * collectRadius) {
+            m_collectedCoins += it->value;
+            it = m_coins.erase(it);
+        } else if (it->lifetime <= 0.f) {
+            it = m_coins.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
+
+void World::draw(sf::RenderWindow &window, const sf::View &cameraView) const {
+    const sf::Vector2f viewSize = cameraView.getSize();
+    const sf::Vector2f viewCenter = cameraView.getCenter();
+    const float left = viewCenter.x - viewSize.x / 2.f - 64.f;
+    const float right = viewCenter.x + viewSize.x / 2.f + 64.f;
+
+    // Draw a strip-based seabed gradient that follows camera and gives infinite-bottom illusion.
+    const float step = 64.f;
+    const int segmentCount = std::max(2, static_cast<int>((right - left) / step) + 2);
+    sf::VertexArray seabed(sf::PrimitiveType::TriangleStrip,
+                           static_cast<std::size_t>(segmentCount) * 2);
+
+    for (int i = 0; i < segmentCount; ++i) {
+        const float x = left + static_cast<float>(i) * step;
+        const float y = getSeabedY(x);
+        const std::size_t idx = static_cast<std::size_t>(i) * 2;
+
+        seabed[idx].position = sf::Vector2f(x, y);
+        seabed[idx + 1].position = sf::Vector2f(x, y + 700.f);
+        seabed[idx].color = sf::Color(69, 88, 95);
+        seabed[idx + 1].color = sf::Color(42, 56, 64);
+    }
+    window.draw(seabed);
+
+    for (auto f : m_fishes)
+        f->draw(window);
+    for (const auto &c : m_coins)
+        c.draw(window);
+}
+
 std::vector<Fish *> &World::getFishes() {
     return m_fishes;
+}
+
+void World::handleAttack(sf::Vector2f pos, float range, int damage) {
+    for (auto f : m_fishes)
+        if (f->isColliding(pos, range))
+            f->takeDamage(damage);
+}
+
+int World::getCoinCount() const {
+    return m_collectedCoins;
+}
+
+float World::getSeabedY(float x) const {
+    const float base = m_bounds.position.y + m_bounds.size.y - 240.f;
+    const float waveA = std::sin(x * 0.0023f) * 50.f;
+    const float waveB = std::sin(x * 0.0067f + 1.7f) * 20.f;
+    return base + waveA + waveB;
+}
+
+void World::resetAround(sf::Vector2f center) {
+    for (auto *f : m_fishes)
+        delete f;
+    m_fishes.clear();
+    m_coins.clear();
+    m_spawnTimer = 0.f;
+
+    const sf::FloatRect seedRect(center - sf::Vector2f(400.f, 300.f), sf::Vector2f(800.f, 600.f));
+    const int initialCount = m_targetFishMin;
+    for (int i = 0; i < initialCount; ++i)
+        spawnRandomFish(seedRect);
 }
 
 } // namespace Game
