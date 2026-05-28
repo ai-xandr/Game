@@ -20,7 +20,7 @@ bool Game::isPointInside(sf::Vector2f point, const sf::FloatRect &rect) const {
 }
 
 Game::Game()
-    : m_window(sf::VideoMode({800, 600}), "Underwater Game", sf::Style::Default),
+    : m_window(sf::VideoMode({800, 600}), "David the Vodolaz", sf::Style::Default),
       m_camera(sf::FloatRect({0.f, 0.f}, {2000.f, 2000.f}), {800.f, 600.f}),
       m_diver(sf::Vector2f(1000.f, 1000.f)), m_world(sf::FloatRect({0.f, 0.f}, {2000.f, 2000.f})) {
     m_window.setFramerateLimit(60);
@@ -157,6 +157,19 @@ void Game::update(float deltaTime) {
     if (m_state == Playing) {
         m_diver.handleInput();
         m_diver.update(deltaTime, m_world.getSeabedY(m_diver.getPosition().x));
+        sf::Vector2f diverPos = m_diver.getPosition();
+        for (const auto &rock : m_world.getRocks()) {
+            if (rock.checkCollision(diverPos, PLAYER_RADIUS)) {
+                sf::Vector2f diff = diverPos - rock.getPosition();
+                float len = std::sqrt(diff.x * diff.x + diff.y * diff.y);
+                if (len > 0.001f) {
+                    diff /= len;
+                    m_diver.setPosition(rock.getPosition() +
+                                        diff * (rock.getRadius() + PLAYER_RADIUS + 1.f));
+                }
+                m_diver.resetVelocity();
+            }
+        }
         m_camera.update(m_diver.getPosition());
         m_world.update(deltaTime, m_diver.getPosition(), m_camera.getView());
 

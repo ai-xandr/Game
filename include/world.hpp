@@ -3,6 +3,7 @@
 
 #include "coin.hpp"
 #include "common.hpp"
+#include "rock.hpp"
 #include <random>
 #include <vector>
 
@@ -19,6 +20,9 @@ class World {
     int getCoinCount() const;
     float getSeabedY(float x) const;
     void resetAround(sf::Vector2f center);
+    const std::vector<Rock> &getRocks() const {
+        return m_rocks;
+    }
 
   private:
     std::vector<Fish *> m_fishes;
@@ -31,6 +35,8 @@ class World {
     std::uniform_real_distribution<float> m_dist01{0.f, 1.f};
     void spawnRandomFish(const sf::FloatRect &visibleRect);
     int m_collectedCoins = 0;
+    std::vector<Rock> m_rocks;
+    void spawnInitialRocks();
 };
 } // namespace Game
 #endif

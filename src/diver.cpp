@@ -162,4 +162,8 @@ int Diver::getAttackDamage() const {
     return m_attackDamage;
 }
 
+void Diver::resetVelocity() {
+    m_velocity = sf::Vector2f(0.f, 0.f);
+}
+
 } // namespace Game

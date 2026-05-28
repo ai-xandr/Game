@@ -16,6 +16,7 @@ class Diver {
     sf::Vector2f getPosition() const;
     void setPosition(sf::Vector2f pos);
     void takeDamage(int damage);
+    void resetVelocity();
     bool isDead() const;
     void reset();
     int getHp() const;
