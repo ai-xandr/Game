@@ -53,6 +53,12 @@ class Fish {
         else if (dirX < 0.f)
             m_velocity.x = -std::abs(m_speed);
     }
+    void setPosition(sf::Vector2f pos) {
+        m_position = pos;
+    }
+    float getHorizontalDirection() const {
+        return m_velocity.x >= 0.f ? 1.f : -1.f;
+    }
 
   protected:
     sf::Vector2f m_position;
