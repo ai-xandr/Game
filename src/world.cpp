@@ -157,12 +157,19 @@ void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &camer
         }
         if (!valid)
             continue;
+
         float radius = 40.f + m_dist01(m_rng) * 100.f;
+
         float seabedY = getSeabedY(point.x);
         point.y = std::min(point.y, seabedY - radius);
         point.y = std::max(point.y, radius);
+
+        if (safeRect.contains(point))
+            continue;
+
         m_rocks.emplace_back(point, radius);
     }
+
     for (auto f : m_fishes)
         f->update(deltaTime, diverPos, m_fishes);
 
