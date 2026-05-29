@@ -82,7 +82,10 @@ void World::spawnInitialRocks() {
     for (int i = 0; i < numRocks; ++i) {
         float x = m_dist01(m_rng) * WORLD_WIDTH;
         float y = m_dist01(m_rng) * WORLD_HEIGHT;
+        float seabedY = getSeabedY(x);
         float radius = 40.f + m_dist01(m_rng) * 100.f;
+        y = std::min(y, seabedY - radius);
+        y = std::max(y, radius);
         m_rocks.emplace_back(sf::Vector2f(x, y), radius);
     }
 }
@@ -155,6 +158,9 @@ void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &camer
         if (!valid)
             continue;
         float radius = 40.f + m_dist01(m_rng) * 100.f;
+        float seabedY = getSeabedY(point.x);
+        point.y = std::min(point.y, seabedY - radius);
+        point.y = std::max(point.y, radius);
         m_rocks.emplace_back(point, radius);
     }
     for (auto f : m_fishes)
