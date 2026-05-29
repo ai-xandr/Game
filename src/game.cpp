@@ -40,9 +40,9 @@ Game::Game()
       m_diver(sf::Vector2f(1000.f, 1000.f)), m_world(sf::FloatRect({0.f, 0.f}, {2000.f, 2000.f})) {
     m_window.setFramerateLimit(60);
 
-    if (!m_bgTexture.loadFromFile("assets/backgrounds/Background.png")) {
+    if (!m_bgTexture.loadFromFile("assets/backgrounds/Background.jpg")) {
         [[maybe_unused]] const bool loadedFallbackBg =
-            m_bgTexture.loadFromFile("assets/Background.png");
+            m_bgTexture.loadFromFile("assets/Background.jpg");
     }
     if (m_bgTexture.getSize().x > 0)
         m_bgTexture.setRepeated(true);
@@ -108,7 +108,7 @@ void Game::drawParallaxLayer(const sf::Texture &texture, const sf::View &view, f
 
     const sf::Vector2f center = view.getCenter();
     const sf::Vector2f size = view.getSize();
-    const float layerCenterX = center.x * parallax;
+    const float layerCenterX = center.x * (1.0f - parallax);
     const float layerLeft = layerCenterX - size.x / 2.f;
     const float layerTop = center.y - size.y / 2.f;
 
@@ -484,7 +484,18 @@ void Game::render() {
 
     m_window.setView(m_camera.getView());
     const sf::View view = m_camera.getView();
-    drawParallaxLayer(m_bgTexture, view, m_bgParallax, sf::Color::White, false);
+    const sf::Vector2f viewCenter = view.getCenter();
+    const sf::Vector2f viewSize = view.getSize();  
+    if (m_bgTexture.getSize().x > 0 && m_bgTexture.getSize().y > 0) {
+        sf::Sprite bgSprite(m_bgTexture);
+        float scaleY = viewSize.y / m_bgTexture.getSize().y;
+        float scaleX = viewSize.x / m_bgTexture.getSize().x;
+        float scale = std::max(scaleX, scaleY);
+        bgSprite.setScale({scale, scale});
+        sf::Vector2f spriteSize(m_bgTexture.getSize().x * scale, m_bgTexture.getSize().y * scale);
+        bgSprite.setPosition(viewCenter - spriteSize / 2.f);
+        m_window.draw(bgSprite);
+    }
     drawParallaxLayer(m_cloudTexture, view, m_cloudParallax, sf::Color(255, 255, 255, 200), false);
 
     if (m_state == Playing || m_state == Paused || m_state == GameOver) {
@@ -506,7 +517,7 @@ void Game::render() {
         m_window.draw(*m_coinText);
     }
 
-    if (m_hpText && (m_state == Playing || m_state == Paused)) {
+    if (m_hpText) {
         m_hpText->setString("HP: " + std::to_string(m_diver.getHp()));
         m_window.draw(*m_hpText);
     }
