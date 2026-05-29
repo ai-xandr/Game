@@ -81,7 +81,7 @@ Game::Game()
 
 void Game::applyPersistentUpgrades() {
     m_diver.setCooldownReduction(m_cooldownReduction);
-    m_diver.setDamageMultiplier(m_damageMultiplier);
+    m_diver.setDamageBonus(m_damageBonus);
 }
 
 void Game::startNewRun() {
@@ -181,7 +181,7 @@ void Game::processEvents() {
             else if (m_state == ShopScreen) {
                 int coins = m_world.getCoinCount();
                 const auto result = m_shop.handleClick(click, windowSize, coins,
-                                                       m_cooldownReduction, m_damageMultiplier);
+                                                       m_cooldownReduction, m_damageBonus);
                 m_world.setCoinCount(coins);
                 if (result == Shop::ClickResult::Purchased) {
                     applyPersistentUpgrades();
@@ -315,11 +315,19 @@ void Game::update(float deltaTime) {
 
 #if defined(SFML_VERSION_MAJOR) && (SFML_VERSION_MAJOR >= 3)
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
-            m_diver.attack();
-            const int hits = m_world.handleAttack(m_diver.getPosition(), m_diver.getAttackRange(),
-                                                  m_diver.getAttackDamage());
-            if (hits > 0)
-                m_audio.playBeat();
+            if (m_diver.attack()) {
+                const int hits = m_world.handleAttack(
+                    m_diver.getPosition(), m_diver.getAttackRange(), m_diver.getAttackDamage());
+                if (hits > 0)
+                    m_audio.playBeat();
+            }
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::H)) {
+            const int healCost = 5;
+            if (m_world.getCoinCount() >= healCost && m_diver.getHp() < 10) {
+                m_world.setCoinCount(m_world.getCoinCount() - healCost);
+                m_diver.heal(5);
+            }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
             m_state = Paused;
@@ -451,7 +459,7 @@ void Game::renderShop() {
     m_window.clear(sf::Color(30, 30, 30));
     m_window.setView(m_window.getDefaultView());
     m_shop.draw(m_window, m_hasUiFont ? &m_uiFont : nullptr, m_world.getCoinCount(),
-                m_cooldownReduction, m_damageMultiplier);
+                m_cooldownReduction, m_damageBonus);
 }
 
 void Game::render() {

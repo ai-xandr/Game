@@ -10,9 +10,9 @@ Shop::Shop() {
         {"Attack CD -10%", 50, 0.10f, OfferKind::CooldownReduction},
         {"Attack CD -20%", 100, 0.20f, OfferKind::CooldownReduction},
         {"Attack CD -30%", 150, 0.30f, OfferKind::CooldownReduction},
-        {"Damage +5%", 40, 0.05f, OfferKind::DamageBoost},
-        {"Damage +10%", 80, 0.10f, OfferKind::DamageBoost},
-        {"Damage +20%", 120, 0.20f, OfferKind::DamageBoost},
+        {"Damage +1", 40, 1.0f, OfferKind::DamageBoost},
+        {"Damage +2", 80, 2.0f, OfferKind::DamageBoost},
+        {"Damage +3", 120, 3.0f, OfferKind::DamageBoost},
     };
     m_purchased.assign(m_offers.size(), false);
 }
@@ -50,8 +50,7 @@ bool Shop::isPointInside(sf::Vector2f point, const sf::FloatRect &rect) const {
     return rect.contains(point);
 }
 
-bool Shop::tryBuy(std::size_t index, int &coins, float &cooldownReduction,
-                  float &damageMultiplier) {
+bool Shop::tryBuy(std::size_t index, int &coins, float &cooldownReduction, float &damageBonus) {
     if (index >= m_offers.size() || m_purchased[index])
         return false;
 
@@ -65,13 +64,13 @@ bool Shop::tryBuy(std::size_t index, int &coins, float &cooldownReduction,
     if (offer.kind == OfferKind::CooldownReduction)
         cooldownReduction = std::max(cooldownReduction, offer.percent);
     else
-        damageMultiplier = std::max(damageMultiplier, 1.f + offer.percent);
+        damageBonus += static_cast<int>(offer.percent);
 
     return true;
 }
 
 Shop::ClickResult Shop::handleClick(sf::Vector2f click, sf::Vector2f windowSize, int &coins,
-                                    float &cooldownReduction, float &damageMultiplier) {
+                                    float &cooldownReduction, float &damageBonus) {
 
     if (isPointInside(click, getBackButtonRect(windowSize)))
         return ClickResult::Back;
@@ -79,7 +78,7 @@ Shop::ClickResult Shop::handleClick(sf::Vector2f click, sf::Vector2f windowSize,
     for (std::size_t i = 0; i < m_offers.size(); ++i) {
         if (!isPointInside(click, getOfferButtonRect(i, windowSize)))
             continue;
-        if (tryBuy(i, coins, cooldownReduction, damageMultiplier))
+        if (tryBuy(i, coins, cooldownReduction, damageBonus))
             return ClickResult::Purchased;
         return ClickResult::None;
     }

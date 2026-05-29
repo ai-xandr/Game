@@ -20,11 +20,12 @@ class Diver {
     bool isDead() const;
     void reset();
     int getHp() const;
+    void heal(int amount);
 
     float getAttackRange() const;
     int getAttackDamage() const;
     void setCooldownReduction(float reduction);
-    void setDamageMultiplier(float multiplier);
+    void setDamageBonus(int bonus);
 
   private:
     sf::Vector2f m_position;
@@ -39,7 +40,7 @@ class Diver {
     int m_baseAttackDamage = 1;
     float m_attackRange = 48.0f;
     float m_cooldownReduction = 0.f;
-    float m_damageMultiplier = 1.f;
+    int m_damageBonus = 0;
     static constexpr float m_baseAttackCooldown = 0.25f;
     bool m_attacking = false;
     float m_attackTimer = 0.0f;
