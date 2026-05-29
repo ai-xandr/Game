@@ -89,7 +89,8 @@ jobs:
       - name: Build
         run: |
           conan profile detect --force
-          conan install . -of . -b missing -s build_type=Release -s compiler.cppstd=20
+          # Добавляем флаг -o sfml/*:shared=False для статической сборки
+          conan install . -of . -b missing -s build_type=Release -s compiler.cppstd=20 -o sfml/*:shared=False
           cmake --preset conan-default
           cmake --build --preset conan-release
 
@@ -106,17 +107,31 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
       - name: Download Windows Artifact
         uses: actions/download-artifact@v4
         with:
           name: game-windows-latest
-          path: artifacts/game-windows-latest
+          path: dist/windows
 
       - name: Download Linux Artifact
         uses: actions/download-artifact@v4
         with:
           name: game-ubuntu-latest
-          path: artifacts/game-ubuntu-latest
+          path: dist/linux
+          
+      - name: Prepare Release Bundles
+        run: |
+          # Копируем папку assets внутрь релизных директорий
+          cp -r assets dist/windows/
+          cp -r assets dist/linux/
+          
+          # Архивируем папки, чтобы не потерять относительные пути ресурсов
+          cd dist
+          zip -r game-windows.zip windows/
+          tar -czvf game-linux.tar.gz linux/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -127,5 +142,5 @@ jobs:
           prerelease: false
           generate_release_notes: false
           files: |
-            artifacts/game-windows-latest/Game.exe
-            artifacts/game-ubuntu-latest/Game
+            dist/game-windows.zip
+            dist/game-linux.tar.gz
