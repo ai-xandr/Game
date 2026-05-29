@@ -82,7 +82,10 @@ void World::spawnInitialRocks() {
     for (int i = 0; i < numRocks; ++i) {
         float x = m_dist01(m_rng) * WORLD_WIDTH;
         float y = m_dist01(m_rng) * WORLD_HEIGHT;
+        float seabedY = getSeabedY(x);
         float radius = 40.f + m_dist01(m_rng) * 100.f;
+        y = std::min(y, seabedY - radius);
+        y = std::max(y, radius);
         m_rocks.emplace_back(sf::Vector2f(x, y), radius);
     }
 }
@@ -155,18 +158,29 @@ void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &camer
         if (!valid)
             continue;
         float radius = 40.f + m_dist01(m_rng) * 100.f;
+        float seabedY = getSeabedY(point.x);
+        point.y = std::min(point.y, seabedY - radius);
+        point.y = std::max(point.y, radius);
         m_rocks.emplace_back(point, radius);
     }
     for (auto f : m_fishes)
         f->update(deltaTime, diverPos, m_fishes);
 
     for (auto f : m_fishes) {
+        f->update(deltaTime, diverPos, m_fishes);
+
+        float seabedY = getSeabedY(f->getPosition().x);
+        float fishHalfHeight = 20.f;
+        if (f->getPosition().y > seabedY - fishHalfHeight) {
+            f->setPosition(sf::Vector2f(f->getPosition().x, seabedY - fishHalfHeight));
+        }
+    }
+
+    for (auto f : m_fishes) {
         sf::Vector2f fishPos = f->getPosition();
         float fishRadius = 25.f;
         for (const auto &rock : m_rocks) {
             if (rock.checkCollision(fishPos, fishRadius)) {
-                float dir = -f->getHorizontalDirection();
-                f->setHorizontalDirection(dir);
                 sf::Vector2f diff = fishPos - rock.getPosition();
                 float len = std::sqrt(diff.x * diff.x + diff.y * diff.y);
                 if (len > 0.001f) {
