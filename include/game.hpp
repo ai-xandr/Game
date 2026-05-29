@@ -63,6 +63,7 @@ class Game {
     float m_damageBonus = 0.f;
 
     std::unique_ptr<sf::Text> m_coinText;
+    std::unique_ptr<sf::Text> m_hpText;
     void drawParallaxLayer(const sf::Texture &texture, const sf::View &view, float parallax,
                            sf::Color tint, bool mirror);
 };
