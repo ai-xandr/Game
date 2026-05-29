@@ -181,8 +181,6 @@ void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &camer
         float fishRadius = 25.f;
         for (const auto &rock : m_rocks) {
             if (rock.checkCollision(fishPos, fishRadius)) {
-                float dir = -f->getHorizontalDirection();
-                f->setHorizontalDirection(dir);
                 sf::Vector2f diff = fishPos - rock.getPosition();
                 float len = std::sqrt(diff.x * diff.x + diff.y * diff.y);
                 if (len > 0.001f) {
