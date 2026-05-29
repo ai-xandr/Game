@@ -16,7 +16,7 @@ World::World(sf::FloatRect bounds) : m_bounds(bounds) {
     // spawn a few initial fishes near the center so player sees activity immediately
     sf::Vector2f center(m_bounds.position.x + m_bounds.size.x / 2.f,
                         m_bounds.position.y + m_bounds.size.y / 2.f);
-    for (int i = 0; i < 16; ++i) {
+    for (int i = 0; i < 60; ++i) {
         float rx = (m_dist01(m_rng) - 0.5f) * 400.f;
         float ry = (m_dist01(m_rng) - 0.5f) * 200.f;
         sf::Vector2f pos = center + sf::Vector2f(rx, ry);
@@ -36,60 +36,47 @@ World::~World() {
         delete f;
 }
 
-void World::spawnRandomFish(const sf::FloatRect &visibleRect) {
+void World::spawnRandomFish(const sf::FloatRect &noSpawnRect) {
+    const float spawnMargin = 150.f;
+    sf::FloatRect spawnRect(noSpawnRect.position - sf::Vector2f(spawnMargin, spawnMargin),
+                            noSpawnRect.size + sf::Vector2f(spawnMargin * 2.f, spawnMargin * 2.f));
+
     float r = m_dist01(m_rng);
     Fish *fish = nullptr;
-    const int side = static_cast<int>(m_dist01(m_rng) * 4.f); // 0 left, 1 right, 2 top, 3 bottom
     sf::Vector2f pos;
-    const float spawnMargin = 120.f;
-    const float safeLeft = visibleRect.position.x - 80.f;
-    const float safeRight = visibleRect.position.x + visibleRect.size.x + 80.f;
-    const float safeTop = visibleRect.position.y - 80.f;
-    const float safeBottom = visibleRect.position.y + visibleRect.size.y + 80.f;
-    if (side == 0) {
-        pos.x = visibleRect.position.x - spawnMargin;
-        pos.y = safeTop + m_dist01(m_rng) * (safeBottom - safeTop);
-    } else if (side == 1) {
-        pos.x = visibleRect.position.x + visibleRect.size.x + spawnMargin;
-        pos.y = safeTop + m_dist01(m_rng) * (safeBottom - safeTop);
-    } else if (side == 2) {
-        pos.y = visibleRect.position.y - spawnMargin;
-        pos.x = safeLeft + m_dist01(m_rng) * (safeRight - safeLeft);
-    } else {
-        pos.y = visibleRect.position.y + visibleRect.size.y + spawnMargin;
-        pos.x = safeLeft + m_dist01(m_rng) * (safeRight - safeLeft);
+    bool valid = false;
+
+    for (int attempt = 0; attempt < 50; ++attempt) {
+        float x = spawnRect.position.x + m_dist01(m_rng) * spawnRect.size.x;
+        float y = spawnRect.position.y + m_dist01(m_rng) * spawnRect.size.y;
+        sf::Vector2f point(x, y);
+        if (!noSpawnRect.contains(point)) {
+            pos = point;
+            valid = true;
+            break;
+        }
     }
 
-    auto randomY = [&]() { return safeTop + m_dist01(m_rng) * (safeBottom - safeTop); };
+    if (!valid)
+        return;
 
-    if (r < 0.4f) {
-        pos.y = randomY();
+    if (r < 0.4f)
         fish = new GoldFish(pos);
-    } else if (r < 0.8f) {
-        pos.y = randomY();
+    else if (r < 0.8f)
         fish = new Tuna(pos);
-    } else if (r < 0.9f) {
-        pos.y = getSeabedY(pos.x) - 20.f;
-        fish = new Crab(pos);
-    } else if (r < 0.98f) {
-        pos.y = getSeabedY(pos.x) - 10.f;
-        fish = new Shell(pos);
-    } else {
-        pos.y = randomY();
+    else if (r < 0.9f)
+        fish = new Crab(sf::Vector2f(pos.x, getSeabedY(pos.x) - 20.f));
+    else if (r < 0.98f)
+        fish = new Shell(sf::Vector2f(pos.x, getSeabedY(pos.x) - 10.f));
+    else
         fish = new Shark(pos);
-    }
 
     if (fish != nullptr) {
-        if (side == 0)
-            fish->setHorizontalDirection(1.f);
-        else if (side == 1)
-            fish->setHorizontalDirection(-1.f);
-        else
-            fish->setHorizontalDirection(m_dist01(m_rng) < 0.5f ? -1.f : 1.f);
+        float dirX = m_dist01(m_rng) < 0.5f ? -1.f : 1.f;
+        fish->setHorizontalDirection(dirX);
         m_fishes.push_back(fish);
     }
 }
-
 void World::spawnInitialRocks() {
     const int numRocks = 15;
     for (int i = 0; i < numRocks; ++i) {
@@ -173,7 +160,7 @@ void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &camer
     for (auto f : m_fishes)
         f->update(deltaTime, diverPos, m_fishes);
 
-    const float cullMargin = 0.f;
+    const float cullMargin = 400.f;
     sf::FloatRect cullRect(visibleRect.position - sf::Vector2f(cullMargin, cullMargin),
                            visibleRect.size + sf::Vector2f(cullMargin * 2.f, cullMargin * 2.f));
 

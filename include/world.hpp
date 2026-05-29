@@ -28,8 +28,8 @@ class World {
     std::vector<Fish *> m_fishes;
     sf::FloatRect m_bounds;
     float m_spawnTimer = 0.f;
-    float m_spawnInterval = 0.3f;
-    int m_targetFishMin = 24;
+    float m_spawnInterval = 1.0f;
+    int m_targetFishMin = 15;
     std::mt19937 m_rng;
     std::uniform_real_distribution<float> m_dist01{0.f, 1.f};
     void spawnRandomFish(const sf::FloatRect &visibleRect);
