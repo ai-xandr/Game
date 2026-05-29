@@ -25,13 +25,13 @@ class Shop {
     enum class ClickResult { None, Purchased, Back };
 
     ClickResult handleClick(sf::Vector2f click, sf::Vector2f windowSize, int &coins,
-                            float &cooldownReduction, float &damageMultiplier);
+                            float &cooldownReduction, float &damageBonus);
 
   private:
     sf::FloatRect getBackButtonRect(sf::Vector2f windowSize) const;
     sf::FloatRect getOfferButtonRect(std::size_t index, sf::Vector2f windowSize) const;
     bool isPointInside(sf::Vector2f point, const sf::FloatRect &rect) const;
-    bool tryBuy(std::size_t index, int &coins, float &cooldownReduction, float &damageMultiplier);
+    bool tryBuy(std::size_t index, int &coins, float &cooldownReduction, float &damageBonus);
 
     std::vector<Offer> m_offers;
     std::vector<bool> m_purchased;

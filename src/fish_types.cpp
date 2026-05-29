@@ -20,7 +20,7 @@ GoldFish::GoldFish(sf::Vector2f startPos) : Fish(startPos, 60.f, 3, FishType::Pr
     m_sprite.setOrigin({fishW.x / 2.f, fishW.y / 2.f});
     m_velocity = sf::Vector2f(m_speed, 0.f);
 
-    m_health = 1;
+    m_health = 2;
 }
 
 void GoldFish::update(float deltaTime, sf::Vector2f diverPos,
@@ -71,7 +71,7 @@ Tuna::Tuna(sf::Vector2f startPos) : Fish(startPos, 90.f, 5, FishType::Prey) {
     m_sprite.setOrigin({fishW.x / 2.f, fishW.y / 2.f});
     m_velocity = sf::Vector2f(m_speed, 0.f);
 
-    m_health = 2;
+    m_health = 4;
 }
 
 void Tuna::update(float deltaTime, sf::Vector2f diverPos, const std::vector<Fish *> &allFishes) {
@@ -83,7 +83,7 @@ void Tuna::update(float deltaTime, sf::Vector2f diverPos, const std::vector<Fish
     m_position += m_velocity * deltaTime;
 
     m_wobbleTime += deltaTime;
-    float wobble = std::sin(m_wobbleTime * 7.f) * 0.03f; // тут так же можно поэксперементировать
+    float wobble = std::sin(m_wobbleTime * 7.f) * 0.03f;
 
     if (m_velocity.x < -0.1f)
         m_sprite.setScale({-m_baseScale, m_baseScale * (1.f + wobble)});
@@ -119,7 +119,7 @@ Shark::Shark(sf::Vector2f startPos) : Fish(startPos, 150.f, 15, FishType::Predat
     m_sprite.setOrigin({fishW.x / 2.f, fishW.y / 2.f});
     m_velocity = sf::Vector2f(m_speed, 0.f);
 
-    m_health = 3;
+    m_health = 7;
 }
 
 void Shark::update(float deltaTime, sf::Vector2f diverPos, const std::vector<Fish *> &allFishes) {
@@ -142,7 +142,7 @@ void Shark::update(float deltaTime, sf::Vector2f diverPos, const std::vector<Fis
     m_position += m_velocity * deltaTime;
 
     m_wobbleTime += deltaTime;
-    float wobble = std::sin(m_wobbleTime * 6.f) * 0.035f; // тут так же можно поэксперементировать
+    float wobble = std::sin(m_wobbleTime * 6.f) * 0.035f;
 
     if (m_velocity.x > 0.1f)
         m_sprite.setScale({-m_baseScale, m_baseScale * (1.f + wobble)});

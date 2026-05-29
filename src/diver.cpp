@@ -120,10 +120,14 @@ bool Diver::attack() {
     if (!m_attacking && m_attackCooldown <= 0.f) {
         m_attacking = true;
         m_attackTimer = 0.25f;
-        m_attackCooldown = ATTACK_COOLDOWN;
+        m_attackCooldown = ATTACK_COOLDOWN * (1.0f - m_cooldownReduction);
         return true;
     }
     return false;
+}
+
+void Diver::heal(int amount) {
+    m_hp = std::min(m_hp + amount, 10);
 }
 
 void Diver::draw(sf::RenderWindow &window) const {
@@ -166,17 +170,16 @@ float Diver::getAttackRange() const {
 }
 
 int Diver::getAttackDamage() const {
-    return std::max(1, static_cast<int>(std::lround(m_baseAttackDamage * m_damageMultiplier)));
+    return m_baseAttackDamage + m_damageBonus;
 }
 
 void Diver::setCooldownReduction(float reduction) {
     m_cooldownReduction = std::clamp(reduction, 0.f, 0.9f);
 }
 
-void Diver::setDamageMultiplier(float multiplier) {
-    m_damageMultiplier = std::max(1.f, multiplier);
+void Diver::setDamageBonus(int bonus) {
+    m_damageBonus = std::max(0, bonus);
 }
-
 void Diver::resetVelocity() {
     m_velocity = sf::Vector2f(0.f, 0.f);
 }

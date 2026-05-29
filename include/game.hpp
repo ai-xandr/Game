@@ -60,7 +60,7 @@ class Game {
     static constexpr float m_startupDuration = 2.f;
 
     float m_cooldownReduction = 0.f;
-    float m_damageMultiplier = 1.f;
+    float m_damageBonus = 0.f;
 
     std::unique_ptr<sf::Text> m_coinText;
     void drawParallaxLayer(const sf::Texture &texture, const sf::View &view, float parallax,
