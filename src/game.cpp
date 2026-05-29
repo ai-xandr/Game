@@ -485,7 +485,7 @@ void Game::render() {
     m_window.setView(m_camera.getView());
     const sf::View view = m_camera.getView();
     const sf::Vector2f viewCenter = view.getCenter();
-    const sf::Vector2f viewSize = view.getSize();  
+    const sf::Vector2f viewSize = view.getSize();
     if (m_bgTexture.getSize().x > 0 && m_bgTexture.getSize().y > 0) {
         sf::Sprite bgSprite(m_bgTexture);
         float scaleY = viewSize.y / m_bgTexture.getSize().y;
@@ -517,7 +517,7 @@ void Game::render() {
         m_window.draw(*m_coinText);
     }
 
-    if (m_hpText) {
+    if (m_hpText && (m_state == Playing || m_state == Paused)) {
         m_hpText->setString("HP: " + std::to_string(m_diver.getHp()));
         m_window.draw(*m_hpText);
     }
