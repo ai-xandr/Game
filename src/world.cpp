@@ -114,7 +114,7 @@ void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &camer
     }
 
     const float viewMargin = 300.f;
-    const float spawnMargin = 500.f;
+    const float spawnMargin = 400.f;
 
     sf::FloatRect safeRect = visibleRect;
     safeRect.position -= sf::Vector2f(viewMargin, viewMargin);
