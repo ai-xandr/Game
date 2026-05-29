@@ -2,7 +2,6 @@
 #define ROCK_HPP
 
 #include <SFML/Graphics.hpp>
-#include <memory>
 #include <vector>
 
 namespace Game {
@@ -16,13 +15,15 @@ class Rock {
     float getRadius() const;
 
   private:
+    void generateRandomShape();
     sf::Vector2f m_position;
     float m_radius;
-    sf::ConvexShape m_shape;
-    void generateRandomShape();
+    std::vector<sf::Vector2f> m_points;
+    sf::VertexArray m_vertices;
     sf::Texture m_texture;
-    std::unique_ptr<sf::Sprite> m_sprite;
     bool m_hasTexture = false;
 };
+
 } // namespace Game
+
 #endif
