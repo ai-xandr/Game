@@ -161,6 +161,16 @@ void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &camer
         f->update(deltaTime, diverPos, m_fishes);
 
     for (auto f : m_fishes) {
+        f->update(deltaTime, diverPos, m_fishes);
+
+        float seabedY = getSeabedY(f->getPosition().x);
+        float fishHalfHeight = 20.f;
+        if (f->getPosition().y > seabedY - fishHalfHeight) {
+            f->setPosition(sf::Vector2f(f->getPosition().x, seabedY - fishHalfHeight));
+        }
+    }
+
+    for (auto f : m_fishes) {
         sf::Vector2f fishPos = f->getPosition();
         float fishRadius = 25.f;
         for (const auto &rock : m_rocks) {
