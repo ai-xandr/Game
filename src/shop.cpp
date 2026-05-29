@@ -18,10 +18,11 @@ Shop::Shop() {
 }
 
 bool Shop::loadAssets() {
-    m_hasShopTexture = m_shopTexture.loadFromFile("assets/leha_vodnik/Shop.png");
-    if (m_hasShopTexture)
-        m_shopTexture.setSmooth(true);
-    return m_hasShopTexture;
+    // Do not use shop artwork or button sprites; use unified Background.png and simple rectangle
+    // buttons
+    m_hasShopTexture = false;
+    m_hasButtonTexture = false;
+    return false;
 }
 
 sf::FloatRect Shop::getBackButtonRect(sf::Vector2f windowSize) const {
@@ -142,19 +143,39 @@ void Shop::draw(sf::RenderWindow &window, const sf::Font *font, int coins, float
 
     for (std::size_t i = 0; i < m_offers.size(); ++i) {
         const sf::FloatRect rect = getOfferButtonRect(i, windowSize);
-        sf::RectangleShape button;
-        button.setSize(rect.size);
-        button.setPosition(rect.position);
-
         const bool owned = m_purchased[i];
         const bool affordable = coins >= m_offers[i].cost;
-        if (owned)
-            button.setFillColor(sf::Color(70, 90, 70, 230));
-        else if (affordable)
-            button.setFillColor(sf::Color(95, 117, 166, 230));
-        else
-            button.setFillColor(sf::Color(77, 93, 137, 180));
-        window.draw(button);
+        if (m_hasButtonTexture) {
+            const sf::Vector2u texSize = m_buttonTexture.getSize();
+            const int cols = 2;
+            const int rows = 4;
+            const int cellW = texSize.x / cols;
+            const int cellH = texSize.y / rows;
+            const sf::IntRect blueRect(sf::Vector2i(cellW * 1, 0), sf::Vector2i(cellW, cellH));
+
+            sf::Sprite spr(m_buttonTexture);
+            spr.setTextureRect(blueRect);
+            spr.setOrigin({static_cast<float>(cellW) * 0.5f, static_cast<float>(cellH) * 0.5f});
+            spr.setPosition(
+                {rect.position.x + rect.size.x * 0.5f, rect.position.y + rect.size.y * 0.5f});
+            spr.setScale(
+                {rect.size.x / static_cast<float>(cellW), rect.size.y / static_cast<float>(cellH)});
+            if (owned)
+                spr.setColor(sf::Color(160, 180, 160, 230));
+            else if (!affordable)
+                spr.setColor(sf::Color(140, 150, 160, 200));
+            window.draw(spr);
+        } else {
+            sf::RectangleShape button;
+            button.setSize(rect.size);
+            button.setPosition(rect.position);
+            const sf::Color btnColor(42, 46, 68, 230);
+            if (owned)
+                button.setFillColor(sf::Color(60, 70, 90, 230));
+            else
+                button.setFillColor(btnColor);
+            window.draw(button);
+        }
 
         if (font) {
             std::string label = m_offers[i].label + " (" + std::to_string(m_offers[i].cost) + ")";
@@ -171,7 +192,7 @@ void Shop::draw(sf::RenderWindow &window, const sf::Font *font, int coins, float
     sf::RectangleShape backButton;
     backButton.setSize(backRect.size);
     backButton.setPosition(backRect.position);
-    backButton.setFillColor(sf::Color(77, 93, 137, 220));
+    backButton.setFillColor(sf::Color(42, 46, 68, 230));
     window.draw(backButton);
 
     if (font) {

@@ -13,8 +13,13 @@ class AudioManager {
 
     void playStartup();
     void startBackgroundMusic();
+    void startMenuMusic();
+
     void playBeat();
     void playDeath();
+    void playTakingDamage();
+    void playRegeneration();
+    void playWhoosh();
     void playPurchaseSequence();
 
   private:
@@ -23,17 +28,25 @@ class AudioManager {
     sf::SoundBuffer m_startupBuffer;
     sf::SoundBuffer m_beatBuffer;
     sf::SoundBuffer m_deathBuffer;
+    sf::SoundBuffer m_takingDamageBuffer;
+    sf::SoundBuffer m_regenerationBuffer;
+    sf::SoundBuffer m_whooshBuffer;
     sf::SoundBuffer m_buyItemBuffer;
     sf::SoundBuffer m_successBuffer;
 
     std::optional<sf::Sound> m_startupSound;
     std::optional<sf::Sound> m_beatSound;
     std::optional<sf::Sound> m_deathSound;
+    std::optional<sf::Sound> m_takingDamageSound;
+    std::optional<sf::Sound> m_regenerationSound;
+    std::optional<sf::Sound> m_whooshSound;
     std::optional<sf::Sound> m_buyItemSound;
     std::optional<sf::Sound> m_successSound;
 
     sf::Music m_backgroundMusic;
+    sf::Music m_menuMusic;
     bool m_backgroundReady = false;
+    bool m_menuReady = false;
 
     bool m_purchaseSequenceActive = false;
     bool m_waitingForBuyItemEnd = false;

@@ -37,6 +37,8 @@ class Shop {
     std::vector<bool> m_purchased;
     sf::Texture m_shopTexture;
     bool m_hasShopTexture = false;
+    sf::Texture m_buttonTexture;
+    bool m_hasButtonTexture = false;
 };
 
 } // namespace Game
