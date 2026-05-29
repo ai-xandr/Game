@@ -154,9 +154,10 @@ bool Diver::isDead() const {
 }
 
 void Diver::reset() {
-    m_hp = 10;
+    m_hp = std::max(m_hp, 1);
     m_attacking = false;
     m_attackTimer = 0.f;
+    m_attackCooldown = 0.f;
     m_velocity = sf::Vector2f(0.f, 0.f);
     m_movingDirection = sf::Vector2f(0.f, 0.f);
 }

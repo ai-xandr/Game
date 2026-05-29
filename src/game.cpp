@@ -506,7 +506,7 @@ void Game::render() {
         m_window.draw(*m_coinText);
     }
 
-    if (m_hpText) {
+    if (m_hpText && (m_state == Playing || m_state == Paused)) {
         m_hpText->setString("HP: " + std::to_string(m_diver.getHp()));
         m_window.draw(*m_hpText);
     }
