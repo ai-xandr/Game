@@ -45,42 +45,6 @@ class Shark : public Fish {
     AnimatedSprite m_sprite;
 };
 
-class Crab : public Fish {
-  public:
-    Crab(sf::Vector2f startPos);
-    void update(float deltaTime, sf::Vector2f diverPos,
-                const std::vector<Fish *> &allFishes) override;
-    void draw(sf::RenderWindow &window) override;
-    bool isColliding(sf::Vector2f point, float radius) const override;
-
-  private:
-    AnimatedSprite m_sprite;
-};
-
-class Shell : public Fish {
-  public:
-    Shell(sf::Vector2f startPos);
-    void update(float deltaTime, sf::Vector2f diverPos,
-                const std::vector<Fish *> &allFishes) override;
-    void draw(sf::RenderWindow &window) override;
-    bool isColliding(sf::Vector2f point, float radius) const override;
-
-  private:
-    AnimatedSprite m_sprite;
-};
-
-class Algae : public Fish {
-  public:
-    Algae(sf::Vector2f startPos);
-    void update(float deltaTime, sf::Vector2f diverPos,
-                const std::vector<Fish *> &allFishes) override;
-    void draw(sf::RenderWindow &window) override;
-    bool isColliding(sf::Vector2f point, float radius) const override;
-
-  private:
-    AnimatedSprite m_sprite;
-};
-
 } // namespace Game
 
 #endif
