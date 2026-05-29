@@ -72,6 +72,11 @@ Game::Game()
         m_coinText->setFillColor(sf::Color::Yellow);
         m_coinText->setPosition({20.f, 20.f});
     }
+    if (m_hasUiFont) {
+        m_hpText = std::make_unique<sf::Text>(m_uiFont, "", 24);
+        m_hpText->setFillColor(sf::Color::Red);
+        m_hpText->setPosition({20.f, 50.f});
+    }
 
     m_state = Startup;
     m_startupTimer = 0.f;
@@ -499,6 +504,11 @@ void Game::render() {
     if (m_coinText && m_state != MainMenu) {
         m_coinText->setString("Points: " + std::to_string(m_world.getCoinCount()));
         m_window.draw(*m_coinText);
+    }
+
+    if (m_hpText) {
+        m_hpText->setString("HP: " + std::to_string(m_diver.getHp()));
+        m_window.draw(*m_hpText);
     }
 
     m_window.display();
