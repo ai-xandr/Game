@@ -128,7 +128,7 @@ void Shop::draw(sf::RenderWindow &window, const sf::Font *font, int coins, float
         sf::Text coinsText(*font, "Points: " + std::to_string(coins), 22);
         coinsText.setFillColor(sf::Color::Yellow);
         coinsText.setPosition(
-            {panelCenter.x - panelSize.x * 0.5f + 20.f, panelCenter.y - panelSize.y * 0.5f + 56.f});
+            {panelCenter.x - panelSize.x * 0.5f + 20.f, panelCenter.y - panelSize.y * 0.5f + 24.f});
         window.draw(coinsText);
 
         char stats[96];
@@ -136,8 +136,8 @@ void Shop::draw(sf::RenderWindow &window, const sf::Font *font, int coins, float
                       cooldownReduction * 100.f, damageMultiplier);
         sf::Text statsText(*font, stats, 18);
         statsText.setFillColor(sf::Color(200, 210, 235));
-        statsText.setPosition(
-            {panelCenter.x - panelSize.x * 0.5f + 20.f, panelCenter.y - panelSize.y * 0.5f + 82.f});
+        statsText.setPosition({panelCenter.x - panelSize.x * 0.5f + 20.f,
+                               panelCenter.y - panelSize.y * 0.5f + 280.f});
         window.draw(statsText);
     }
 
