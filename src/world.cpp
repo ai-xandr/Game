@@ -12,11 +12,12 @@ World::World(sf::FloatRect bounds) : m_bounds(bounds) {
     std::random_device rd;
     m_rng.seed(rd());
     m_spawnTimer = 0.f;
-    m_spawnInterval = 0.3f;
-    // spawn a few initial fishes near the center so player sees activity immediately
+    m_spawnInterval = 0.8f;
+    m_targetFishMin = 18;
+
     sf::Vector2f center(m_bounds.position.x + m_bounds.size.x / 2.f,
                         m_bounds.position.y + m_bounds.size.y / 2.f);
-    for (int i = 0; i < 60; ++i) {
+    for (int i = 0; i < 10; ++i) {
         float rx = (m_dist01(m_rng) - 0.5f) * 400.f;
         float ry = (m_dist01(m_rng) - 0.5f) * 200.f;
         sf::Vector2f pos = center + sf::Vector2f(rx, ry);
@@ -64,10 +65,6 @@ void World::spawnRandomFish(const sf::FloatRect &noSpawnRect) {
         fish = new GoldFish(pos);
     else if (r < 0.8f)
         fish = new Tuna(pos);
-    else if (r < 0.9f)
-        fish = new Crab(sf::Vector2f(pos.x, getSeabedY(pos.x) - 20.f));
-    else if (r < 0.98f)
-        fish = new Shell(sf::Vector2f(pos.x, getSeabedY(pos.x) - 10.f));
     else
         fish = new Shark(pos);
 
@@ -77,12 +74,18 @@ void World::spawnRandomFish(const sf::FloatRect &noSpawnRect) {
         m_fishes.push_back(fish);
     }
 }
+
 void World::spawnInitialRocks() {
     const int numRocks = 15;
     for (int i = 0; i < numRocks; ++i) {
         float x = m_dist01(m_rng) * WORLD_WIDTH;
         float y = m_dist01(m_rng) * WORLD_HEIGHT;
         float radius = 40.f + m_dist01(m_rng) * 100.f;
+
+        float seabedY = getSeabedY(x);
+        y = std::min(y, seabedY - radius);
+        y = std::max(y, radius);
+
         m_rocks.emplace_back(sf::Vector2f(x, y), radius);
     }
 }
@@ -165,16 +168,21 @@ void World::update(float deltaTime, sf::Vector2f diverPos, const sf::View &camer
         m_rocks.emplace_back(point, radius);
     }
 
-    for (auto f : m_fishes)
+    for (auto f : m_fishes) {
         f->update(deltaTime, diverPos, m_fishes);
+
+        float seabedY = getSeabedY(f->getPosition().x);
+        float fishHalfHeight = 20.f;
+        if (f->getPosition().y > seabedY - fishHalfHeight) {
+            f->setPosition(sf::Vector2f(f->getPosition().x, seabedY - fishHalfHeight));
+        }
+    }
 
     for (auto f : m_fishes) {
         sf::Vector2f fishPos = f->getPosition();
         float fishRadius = 25.f;
         for (const auto &rock : m_rocks) {
             if (rock.checkCollision(fishPos, fishRadius)) {
-                float dir = -f->getHorizontalDirection();
-                f->setHorizontalDirection(dir);
                 sf::Vector2f diff = fishPos - rock.getPosition();
                 float len = std::sqrt(diff.x * diff.x + diff.y * diff.y);
                 if (len > 0.001f) {
@@ -214,7 +222,6 @@ void World::draw(sf::RenderWindow &window, const sf::View &cameraView) const {
     const float left = viewCenter.x - viewSize.x / 2.f - 64.f;
     const float right = viewCenter.x + viewSize.x / 2.f + 64.f;
 
-    // Draw a strip-based seabed gradient that follows camera and gives infinite-bottom illusion.
     const float step = 64.f;
     const int segmentCount = std::max(2, static_cast<int>((right - left) / step) + 2);
     sf::VertexArray seabed(sf::PrimitiveType::TriangleStrip,
@@ -232,9 +239,8 @@ void World::draw(sf::RenderWindow &window, const sf::View &cameraView) const {
     }
     window.draw(seabed);
 
-    for (const auto &rock : m_rocks) {
+    for (const auto &rock : m_rocks)
         rock.draw(window);
-    }
     for (auto f : m_fishes)
         f->draw(window);
 }
