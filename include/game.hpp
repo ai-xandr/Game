@@ -8,6 +8,7 @@
 #include "world.hpp"
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <vector>
 
 namespace Game {
 
@@ -45,9 +46,19 @@ class Game {
     sf::Texture m_bgTexture;
     sf::Texture m_cloudTexture;
     sf::Texture m_startupTexture;
+    sf::Texture m_menuBgTexture;
+    sf::Texture m_buttonTexture;
     sf::Font m_uiFont;
     bool m_hasUiFont = false;
     bool m_hasStartupTexture = false;
+    bool m_hasMenuBg = false;
+    bool m_hasButtonTexture = false;
+
+    std::vector<sf::Texture> m_menuFrames;
+    bool m_hasMenuFrames = false;
+    float m_menuFrameTimer = 0.f;
+    int m_menuCurrentFrame = 0;
+    float m_menuFrameDuration = 0.08f;
 
     float m_bgParallax = 0.6f;
     float m_cloudParallax = 0.3f;
